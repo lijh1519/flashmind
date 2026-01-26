@@ -1,0 +1,8 @@
+
+{
+  "name": "FlashMind AI",
+  "description": "Transform photos of notes and documents into intelligent memory decks using refined AI.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}

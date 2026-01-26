@@ -1,0 +1,108 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#F7FBF9" />
+  <title>FlashMind AI - Snap & Learn</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio"></script>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            primary: "#8BA895",
+            accent: "#A67B8E",
+            moss: {
+              DEFAULT: "#2D3E35",
+              light: "#4A5C52",
+              pale: "#8A9D92",
+              deep: "#1A2620"
+            },
+            mint: {
+              5: "#f9fbf9",
+              50: "#F4F9F6",
+              100: "#EBF4EF",
+              200: "#D8E9E0",
+            },
+            rose: {
+              50: "#FDF5F7",
+              100: "#FCEDF0",
+              200: "#F9D6DD",
+            },
+          },
+          fontFamily: {
+            display: ["Plus Jakarta Sans", "sans-serif"],
+            serif: ["Instrument Serif", "serif"],
+          },
+          boxShadow: {
+            'glow': '0 8px 32px -8px rgba(166, 123, 142, 0.4)',
+            'glow-lg': '0 20px 60px -12px rgba(166, 123, 142, 0.5)',
+            'subtle': '0 2px 20px rgba(0, 0, 0, 0.03)',
+            'card': '0 8px 40px -8px rgba(45, 62, 53, 0.12)',
+            'card-hover': '0 16px 60px -12px rgba(45, 62, 53, 0.18)',
+          },
+          animation: {
+            'float': 'float 6s ease-in-out infinite',
+            'pulse-soft': 'pulse-soft 3s ease-in-out infinite',
+          },
+          keyframes: {
+            float: {
+              '0%, 100%': { transform: 'translateY(0px)' },
+              '50%': { transform: 'translateY(-10px)' },
+            },
+            'pulse-soft': {
+              '0%, 100%': { opacity: '0.6' },
+              '50%': { opacity: '1' },
+            },
+          },
+        },
+      },
+    };
+  </script>
+  <style type="text/tailwindcss">
+    @layer base {
+      body {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        -webkit-tap-highlight-color: transparent;
+        @apply bg-[#FBFDFB] text-moss;
+      }
+      .serif-text {
+        font-family: 'Instrument Serif', serif;
+      }
+    }
+    .perspective-1000 { perspective: 1000px; }
+    .backface-hidden { backface-visibility: hidden; }
+    .rotate-y-180 { transform: rotateY(180deg); }
+    .preserve-3d { transform-style: preserve-3d; }
+    
+    .safe-area-inset {
+      padding-top: env(safe-area-inset-top);
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+  </style>
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@^19.2.3",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "@google/genai": "https://esm.sh/@google/genai@^1.38.0"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+<body>
+  <div id="root"></div>
+<script type="module" src="/index.tsx"></script>
+</body>
+</html>
