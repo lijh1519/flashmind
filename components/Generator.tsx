@@ -3,6 +3,12 @@ import React, { useState, useRef, useEffect } from 'react';
 import { generateFlashcards } from '../services/geminiService';
 import { Deck, GenerateConfig } from '../types';
 import { Language, translations } from '../i18n';
+import * as pdfjsLib from 'pdfjs-dist';
+
+// 配置 PDF.js worker - 使用 jsDelivr CDN
+if (typeof window !== 'undefined') {
+  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@5.4.530/build/pdf.worker.min.mjs';
+}
 
 interface GeneratorProps {
   onDeckCreated: (deck: Deck) => void;
@@ -18,6 +24,7 @@ const Generator: React.FC<GeneratorProps> = ({ onDeckCreated, lang }) => {
   const [error, setError] = useState<string | null>(null);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [showCamera, setShowCamera] = useState(false);
+  const [uploadedFile, setUploadedFile] = useState<{name: string, type: string} | null>(null);
   
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -64,6 +71,83 @@ const Generator: React.FC<GeneratorProps> = ({ onDeckCreated, lang }) => {
     setShowCamera(false);
   };
 
+  const extractTextFromPDF = async (file: File): Promise<string> => {
+    try {
+      console.log('开始解析 PDF:', file.name, file.type, file.size);
+      
+      const arrayBuffer = await file.arrayBuffer();
+      console.log('ArrayBuffer 大小:', arrayBuffer.byteLength);
+      
+      const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
+      const pdf = await loadingTask.promise;
+      console.log('PDF 加载成功,总页数:', pdf.numPages);
+      
+      let fullText = '';
+      
+      // 提取所有页面的文本
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const textContent = await page.getTextContent();
+        const pageText = textContent.items.map((item: any) => item.str).join(' ');
+        fullText += pageText + '\n';
+        console.log(`第 ${i} 页提取完成`);
+      }
+      
+      const trimmedText = fullText.trim();
+      console.log('提取的文本长度:', trimmedText.length);
+      
+      if (!trimmedText || trimmedText.length < 10) {
+        throw new Error(lang === 'zh' ? 'PDF 文件为空或无法读取文本内容' : 'PDF is empty or contains no readable text');
+      }
+      
+      return trimmedText;
+    } catch (error: any) {
+      console.error('PDF 解析错误:', error);
+      
+      // 更详细的错误信息
+      if (error.name === 'InvalidPDFException') {
+        throw new Error(lang === 'zh' ? '无效的 PDF 文件格式' : 'Invalid PDF file format');
+      } else if (error.name === 'PasswordException') {
+        throw new Error(lang === 'zh' ? 'PDF 文件加密,无法解析' : 'PDF is password protected');
+      } else {
+        throw new Error(error.message || (lang === 'zh' ? 'PDF 文件解析失败' : 'Failed to parse PDF file'));
+      }
+    }
+  };
+
+  const handleFileUpload = async (file: File) => {
+    console.log('文件上传:', file.name, file.type, file.size);
+    
+    if (file.type === 'application/pdf') {
+      setLoading(true);
+      setError(null);
+      setUploadedFile({ name: file.name, type: 'pdf' });
+      
+      try {
+        const text = await extractTextFromPDF(file);
+        setContent(text);
+        setCapturedImage(null);
+        console.log('文本设置成功');
+      } catch (err: any) {
+        console.error('文件处理错误:', err);
+        setError(err.message || (lang === 'zh' ? 'PDF 处理失败' : 'Failed to process PDF'));
+        setUploadedFile(null);
+      } finally {
+        setLoading(false);
+      }
+    } else if (file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setCapturedImage(reader.result as string);
+        setUploadedFile(null);
+        setContent('');
+      };
+      reader.readAsDataURL(file);
+    } else {
+      setError(lang === 'zh' ? '仅支持 PDF 和图片文件' : 'Only PDF and image files are supported');
+    }
+  };
+
   const handleCreate = async () => {
     if (!content.trim() && !capturedImage) return;
     setLoading(true);
@@ -108,7 +192,7 @@ const Generator: React.FC<GeneratorProps> = ({ onDeckCreated, lang }) => {
           {t.hero.tag}
         </div>
         <h1 className="text-4xl font-bold text-moss tracking-tight mb-3">
-          {t.hero.titlePrefix}<span className="serif-text italic text-accent">{t.hero.titleItalic}</span>{t.hero.titleSuffix}
+          {t.hero.titlePrefix}<span className="text-accent">{t.hero.titleItalic}</span>{t.hero.titleSuffix}
         </h1>
         <p className="text-sm text-moss-light leading-relaxed font-medium opacity-70">
           {t.hero.subtitle}
@@ -126,16 +210,27 @@ const Generator: React.FC<GeneratorProps> = ({ onDeckCreated, lang }) => {
           {showCamera && (
             <div className="fixed inset-0 z-50 bg-black flex flex-col">
               <video ref={videoRef} autoPlay playsInline className="flex-1 object-cover" />
+              
+              {/* 拍摄提示 */}
+              <div className="absolute top-8 left-0 right-0 flex justify-center pointer-events-none">
+                <div className="bg-black/60 backdrop-blur-md px-6 py-3 rounded-full border border-white/20">
+                  <p className="text-white text-sm font-bold tracking-wide">对准书籍或文章内容</p>
+                </div>
+              </div>
+              
+              {/* 扫描框 */}
               <div className="absolute top-1/4 left-0 right-0 flex justify-center pointer-events-none">
                  <div className="w-72 h-72 border-2 border-white/20 rounded-3xl relative overflow-hidden">
                     <div className="absolute top-0 left-0 w-full h-1 bg-accent/60 shadow-[0_0_20px_#A67B8E] animate-[scan_2.5s_ease-in-out_infinite]"></div>
                  </div>
               </div>
+              
+              {/* 控制按钮 */}
               <div className="p-12 flex items-center justify-between bg-gradient-to-t from-black to-transparent">
-                <button onClick={stopCamera} className="text-white/60 hover:text-white">
+                <button onClick={stopCamera} className="text-white/60 hover:text-white transition-colors">
                   <span className="material-symbols-outlined text-4xl">close</span>
                 </button>
-                <button onClick={capturePhoto} className="w-20 h-20 bg-white rounded-full flex items-center justify-center border-8 border-white/10 active:scale-90 transition-transform">
+                <button onClick={capturePhoto} className="w-20 h-20 bg-white rounded-full flex items-center justify-center border-8 border-white/10 active:scale-90 transition-transform shadow-glow">
                   <div className="w-14 h-14 bg-accent rounded-full"></div>
                 </button>
                 <div className="w-10"></div>
@@ -163,6 +258,35 @@ const Generator: React.FC<GeneratorProps> = ({ onDeckCreated, lang }) => {
                 </button>
               )}
             </div>
+          ) : uploadedFile ? (
+            <div className="relative mb-6 rounded-3xl overflow-hidden bg-gradient-to-br from-mint-50 to-mint-100/50 border border-mint-200 p-6">
+              <div className="flex items-center gap-4">
+                <div className="w-16 h-16 bg-gradient-to-br from-accent/10 to-accent/5 rounded-2xl flex items-center justify-center">
+                  <span className="material-symbols-outlined text-3xl text-accent">description</span>
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-sm font-bold text-moss mb-1 truncate">{uploadedFile.name}</h3>
+                  <p className="text-xs text-moss-pale uppercase tracking-wider">PDF 文件</p>
+                </div>
+                {!loading && (
+                  <button 
+                    onClick={() => {
+                      setUploadedFile(null);
+                      setContent('');
+                    }}
+                    className="w-10 h-10 bg-moss/10 hover:bg-moss/20 text-moss rounded-full flex items-center justify-center transition-all active:scale-90"
+                  >
+                    <span className="material-symbols-outlined">close</span>
+                  </button>
+                )}
+              </div>
+              {loading && (
+                <div className="mt-4 flex items-center gap-3 text-moss-pale">
+                  <div className="w-4 h-4 border-2 border-accent/30 border-t-accent rounded-full animate-spin"></div>
+                  <span className="text-xs font-bold uppercase tracking-wider">解析中...</span>
+                </div>
+              )}
+            </div>
           ) : (
             <div className="flex gap-4 mb-6">
               <button 
@@ -172,19 +296,24 @@ const Generator: React.FC<GeneratorProps> = ({ onDeckCreated, lang }) => {
                 <div className="absolute inset-0 bg-white/0 group-hover:bg-white/10 transition-colors duration-300"></div>
                 <span className="material-symbols-outlined text-4xl relative z-10 group-hover:scale-110 transition-transform duration-300">photo_camera</span>
                 <span className="text-[10px] font-bold uppercase tracking-[0.2em] relative z-10">{t.generator.camera}</span>
+                <span className="text-[9px] text-white/70 tracking-wide relative z-10">拍摄书籍文章</span>
               </button>
               <label className="group flex-1 h-36 bg-gradient-to-br from-mint-50 to-mint-100/50 border border-mint-200/60 rounded-[28px] flex flex-col items-center justify-center gap-3 text-moss-pale hover:text-moss hover:border-mint-300 active:scale-[0.97] transition-all duration-300 cursor-pointer relative overflow-hidden">
                 <div className="absolute inset-0 bg-white/0 group-hover:bg-white/50 transition-colors duration-300"></div>
-                <input type="file" accept="image/*" className="hidden" onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) {
-                    const reader = new FileReader();
-                    reader.onloadend = () => setCapturedImage(reader.result as string);
-                    reader.readAsDataURL(file);
-                  }
-                }} />
+                <input 
+                  type="file" 
+                  accept="image/*,application/pdf" 
+                  className="hidden" 
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      handleFileUpload(file);
+                    }
+                  }} 
+                />
                 <span className="material-symbols-outlined text-4xl relative z-10 group-hover:scale-110 transition-transform duration-300">upload_file</span>
                 <span className="text-[10px] font-bold uppercase tracking-[0.2em] relative z-10">{t.generator.upload}</span>
+                <span className="text-[9px] text-moss-pale/70 tracking-wide relative z-10">图片/PDF</span>
               </label>
             </div>
           )}
@@ -201,18 +330,18 @@ const Generator: React.FC<GeneratorProps> = ({ onDeckCreated, lang }) => {
           {/* Settings Group */}
           <div className="flex gap-4 mb-8">
             <div className="flex-1 bg-gradient-to-br from-mint-50/80 to-mint-100/40 px-5 py-4 rounded-2xl border border-mint-200/50 flex items-center justify-between shadow-subtle hover:shadow-card transition-all duration-300">
-              <span className="text-[10px] font-bold text-moss-pale uppercase">{t.generator.max}</span>
-              <select value={quantity} onChange={e => setQuantity(Number(e.target.value))} className="bg-transparent border-none text-sm font-bold text-accent p-0 focus:ring-0 cursor-pointer">
-                <option value={5}>5</option>
-                <option value={10}>10</option>
-                <option value={20}>20</option>
+              <span className="text-xs font-bold text-moss uppercase tracking-wider">{t.generator.max}</span>
+              <select value={quantity} onChange={e => setQuantity(Number(e.target.value))} className="bg-transparent border-none text-lg font-extrabold text-accent p-0 focus:ring-0 cursor-pointer">
+                <option value={5}>5 张</option>
+                <option value={10}>10 张</option>
+                <option value={20}>20 张</option>
               </select>
             </div>
             <div className="flex-1 bg-gradient-to-br from-rose-50/80 to-rose-100/40 px-5 py-4 rounded-2xl border border-rose-200/50 flex items-center justify-between shadow-subtle hover:shadow-card transition-all duration-300">
-              <span className="text-[10px] font-bold text-moss-pale uppercase">{t.generator.langLabel}</span>
-              <select value={genLanguage} onChange={e => setGenLanguage(e.target.value)} className="bg-transparent border-none text-sm font-bold text-accent p-0 focus:ring-0 cursor-pointer">
+              <span className="text-xs font-bold text-moss uppercase tracking-wider">{t.generator.langLabel}</span>
+              <select value={genLanguage} onChange={e => setGenLanguage(e.target.value)} className="bg-transparent border-none text-lg font-extrabold text-accent p-0 focus:ring-0 cursor-pointer">
                 <option value="Chinese">中文</option>
-                <option value="English">EN</option>
+                <option value="English">English</option>
               </select>
             </div>
           </div>
