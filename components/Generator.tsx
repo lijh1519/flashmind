@@ -25,9 +25,13 @@ const Generator: React.FC<GeneratorProps> = ({ onDeckCreated, lang }) => {
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [showCamera, setShowCamera] = useState(false);
   const [uploadedFile, setUploadedFile] = useState<{name: string, type: string} | null>(null);
+  const [zoomLevel, setZoomLevel] = useState(1);
+  const [isPinching, setIsPinching] = useState(false);
   
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const initialDistanceRef = useRef<number>(0);
+  const currentStreamRef = useRef<MediaStream | null>(null);
 
   useEffect(() => {
     setGenLanguage(lang === 'zh' ? 'Chinese' : 'English');
@@ -36,12 +40,23 @@ const Generator: React.FC<GeneratorProps> = ({ onDeckCreated, lang }) => {
   const startCamera = async () => {
     setShowCamera(true);
     setError(null);
+    setZoomLevel(1);
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ 
-        video: { facingMode: 'environment' } 
+        video: { 
+          facingMode: 'environment',
+          width: { ideal: 1920 },
+          height: { ideal: 1080 }
+        } 
       });
+      currentStreamRef.current = stream;
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
+        
+        // 获取视频轨道的缩放能力
+        const videoTrack = stream.getVideoTracks()[0];
+        const capabilities = videoTrack.getCapabilities();
+        console.log('Camera capabilities:', capabilities);
       }
     } catch (err) {
       setError(lang === 'zh' ? "无法访问相机，请确保已授予权限。" : "Cannot access camera. Please ensure permissions are granted.");
@@ -67,8 +82,99 @@ const Generator: React.FC<GeneratorProps> = ({ onDeckCreated, lang }) => {
     if (videoRef.current && videoRef.current.srcObject) {
       const stream = videoRef.current.srcObject as MediaStream;
       stream.getTracks().forEach(track => track.stop());
+      // 重置 transform
+      videoRef.current.style.transform = 'scale(1)';
+    }
+    if (currentStreamRef.current) {
+      currentStreamRef.current.getTracks().forEach(track => track.stop());
+      currentStreamRef.current = null;
     }
     setShowCamera(false);
+    setZoomLevel(1);
+  };
+
+  // 应用缩放 - 使用 CSS transform 作为后备方案
+  const applyZoom = async (zoom: number) => {
+    const clampedZoom = Math.max(1, Math.min(zoom, 5)); // 限制 1x-5x
+    
+    if (!currentStreamRef.current) return;
+    
+    try {
+      const videoTrack = currentStreamRef.current.getVideoTracks()[0];
+      const capabilities = videoTrack.getCapabilities() as any;
+      
+      // 尝试使用硬件缩放
+      if (capabilities.zoom) {
+        const minZoom = capabilities.zoom.min || 1;
+        const maxZoom = capabilities.zoom.max || 3;
+        const hardwareZoom = Math.max(minZoom, Math.min(clampedZoom, maxZoom));
+        
+        await videoTrack.applyConstraints({
+          advanced: [{ zoom: hardwareZoom } as any]
+        });
+        console.log('使用硬件缩放:', hardwareZoom);
+      } else {
+        console.log('硬件不支持缩放,使用 CSS transform');
+      }
+    } catch (err) {
+      console.error('硬件缩放失败:', err);
+    }
+    
+    // 无论硬件是否支持,都使用 CSS transform 提供视觉反馈
+    setZoomLevel(clampedZoom);
+    
+    // 应用 CSS 缩放到视频元素
+    if (videoRef.current) {
+      videoRef.current.style.transform = `scale(${clampedZoom})`;
+      videoRef.current.style.transformOrigin = 'center center';
+    }
+  };
+
+  // 计算两指间距离
+  const getDistance = (touch1: React.Touch, touch2: React.Touch) => {
+    const dx = touch1.clientX - touch2.clientX;
+    const dy = touch1.clientY - touch2.clientY;
+    return Math.sqrt(dx * dx + dy * dy);
+  };
+
+  // 触摸开始
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (e.touches.length === 2) {
+      e.preventDefault();
+      setIsPinching(true);
+      initialDistanceRef.current = getDistance(e.touches[0], e.touches[1]);
+    }
+  };
+
+  // 触摸移动
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (e.touches.length === 2 && initialDistanceRef.current > 0) {
+      e.preventDefault();
+      const currentDistance = getDistance(e.touches[0], e.touches[1]);
+      const scale = currentDistance / initialDistanceRef.current;
+      const newZoom = zoomLevel * scale;
+      
+      applyZoom(newZoom);
+      initialDistanceRef.current = currentDistance;
+    }
+  };
+
+  // 触摸结束
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (e.touches.length < 2) {
+      initialDistanceRef.current = 0;
+      // 延迟重置 pinching 状态，防止误触发拍照
+      setTimeout(() => setIsPinching(false), 100);
+    }
+  };
+
+  // 处理拍照点击
+  const handleCaptureClick = (e: React.MouseEvent | React.TouchEvent) => {
+    if (isPinching) {
+      e.preventDefault();
+      return;
+    }
+    capturePhoto();
   };
 
   const extractTextFromPDF = async (file: File): Promise<string> => {
@@ -208,33 +314,73 @@ const Generator: React.FC<GeneratorProps> = ({ onDeckCreated, lang }) => {
         <div className="p-6 relative z-10">
           {/* Camera Overlay */}
           {showCamera && (
-            <div className="fixed inset-0 z-50 bg-black flex flex-col">
-              <video ref={videoRef} autoPlay playsInline className="flex-1 object-cover" />
+            <div className="fixed inset-0 z-[100] bg-black flex flex-col">
+              {/* 可点击拍照的视频区域 */}
+              <div 
+                className="flex-1 relative"
+                onTouchStart={handleTouchStart}
+                onTouchMove={handleTouchMove}
+                onTouchEnd={handleTouchEnd}
+              >
+                <video ref={videoRef} autoPlay playsInline className="w-full h-full object-cover" />
+                
+                {/* 拍摄提示 */}
+                <div className="absolute top-8 left-0 right-0 flex justify-center pointer-events-none z-10">
+                  <div className="bg-black/60 backdrop-blur-md px-6 py-3 rounded-full border border-white/20">
+                    <p className="text-white text-sm font-bold tracking-wide">双指缩放 · 点击拍摄</p>
+                  </div>
+                </div>
+                
+                {/* 扫描框 */}
+                <div className="absolute top-1/4 left-0 right-0 flex justify-center pointer-events-none z-10">
+                   <div className="w-72 h-72 border-2 border-white/20 rounded-3xl relative overflow-hidden">
+                      <div className="absolute top-0 left-0 w-full h-1 bg-accent/60 shadow-[0_0_20px_#A67B8E] animate-[scan_2.5s_ease-in-out_infinite]"></div>
+                   </div>
+                </div>
+                
+                {/* 缩放指示器 */}
+                {zoomLevel > 1 && (
+                  <div className="absolute bottom-44 left-0 right-0 flex justify-center pointer-events-none z-10">
+                    <div className="bg-black/60 backdrop-blur-md px-4 py-2 rounded-full border border-white/20">
+                      <p className="text-white text-xs font-bold">{zoomLevel.toFixed(1)}x</p>
+                    </div>
+                  </div>
+                )}
+              </div>
               
-              {/* 拍摄提示 */}
-              <div className="absolute top-8 left-0 right-0 flex justify-center pointer-events-none">
-                <div className="bg-black/60 backdrop-blur-md px-6 py-3 rounded-full border border-white/20">
-                  <p className="text-white text-sm font-bold tracking-wide">对准书籍或文章内容</p>
+              {/* 底部控制栏 */}
+              <div className="absolute bottom-24 left-0 right-0 pb-6 z-20">
+                <div className="flex items-center justify-center px-8">
+                  {/* 左侧占位 */}
+                  <div className="flex-1"></div>
+                  
+                  {/* 中间拍照按钮 */}
+                  <button 
+                    onClick={handleCaptureClick}
+                    className="relative w-20 h-20 flex items-center justify-center group"
+                  >
+                    {/* 外圈 - 脉动效果 */}
+                    <div className="absolute inset-0 rounded-full border-4 border-white/30 group-active:scale-95 transition-transform"></div>
+                    <div className="absolute inset-0 rounded-full border-4 border-white/20 animate-ping"></div>
+                    
+                    {/* 内圈 - 主按钮 */}
+                    <div className="relative w-16 h-16 bg-white rounded-full shadow-glow-lg group-active:scale-90 transition-all duration-150 flex items-center justify-center">
+                      <div className="w-14 h-14 bg-gradient-to-br from-accent via-accent to-accent/80 rounded-full shadow-inner"></div>
+                    </div>
+                  </button>
+                  
+                  {/* 右侧占位 */}
+                  <div className="flex-1"></div>
                 </div>
               </div>
               
-              {/* 扫描框 */}
-              <div className="absolute top-1/4 left-0 right-0 flex justify-center pointer-events-none">
-                 <div className="w-72 h-72 border-2 border-white/20 rounded-3xl relative overflow-hidden">
-                    <div className="absolute top-0 left-0 w-full h-1 bg-accent/60 shadow-[0_0_20px_#A67B8E] animate-[scan_2.5s_ease-in-out_infinite]"></div>
-                 </div>
-              </div>
-              
-              {/* 控制按钮 */}
-              <div className="p-12 flex items-center justify-between bg-gradient-to-t from-black to-transparent">
-                <button onClick={stopCamera} className="text-white/60 hover:text-white transition-colors">
-                  <span className="material-symbols-outlined text-4xl">close</span>
-                </button>
-                <button onClick={capturePhoto} className="w-20 h-20 bg-white rounded-full flex items-center justify-center border-8 border-white/10 active:scale-90 transition-transform shadow-glow">
-                  <div className="w-14 h-14 bg-accent rounded-full"></div>
-                </button>
-                <div className="w-10"></div>
-              </div>
+              {/* 关闭按钮 */}
+              <button 
+                onClick={stopCamera} 
+                className="absolute top-6 left-6 w-12 h-12 flex items-center justify-center rounded-full bg-black/60 backdrop-blur-md text-white hover:bg-black/80 transition-all active:scale-90 z-20"
+              >
+                <span className="material-symbols-outlined text-2xl">close</span>
+              </button>
             </div>
           )}
 
