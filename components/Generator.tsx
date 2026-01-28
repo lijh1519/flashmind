@@ -35,6 +35,7 @@ const Generator: React.FC<GeneratorProps> = ({ onDeckCreated, lang, onCameraStat
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const initialDistanceRef = useRef<number>(0);
+  const initialZoomRef = useRef<number>(1); // 新增：记录开始缩放时的 zoom 值
   const currentStreamRef = useRef<MediaStream | null>(null);
 
   useEffect(() => {
@@ -188,6 +189,7 @@ const Generator: React.FC<GeneratorProps> = ({ onDeckCreated, lang, onCameraStat
       e.preventDefault();
       setIsPinching(true);
       initialDistanceRef.current = getDistance(e.touches[0], e.touches[1]);
+      initialZoomRef.current = zoomLevel; // 记录开始时的 zoom
     }
   };
 
@@ -196,11 +198,11 @@ const Generator: React.FC<GeneratorProps> = ({ onDeckCreated, lang, onCameraStat
     if (e.touches.length === 2 && initialDistanceRef.current > 0) {
       e.preventDefault();
       const currentDistance = getDistance(e.touches[0], e.touches[1]);
-      const scale = currentDistance / initialDistanceRef.current;
-      const newZoom = zoomLevel * scale;
+      const scaleDelta = currentDistance / initialDistanceRef.current;
+      // 基于开始时的 zoom 值计算新的 zoom
+      const newZoom = initialZoomRef.current * scaleDelta;
       
       applyZoom(newZoom);
-      initialDistanceRef.current = currentDistance;
     }
   };
 
@@ -208,6 +210,7 @@ const Generator: React.FC<GeneratorProps> = ({ onDeckCreated, lang, onCameraStat
   const handleTouchEnd = (e: React.TouchEvent) => {
     if (e.touches.length < 2) {
       initialDistanceRef.current = 0;
+      initialZoomRef.current = zoomLevel; // 更新基准 zoom
       // 延迟重置 pinching 状态，防止误触发拍照
       setTimeout(() => setIsPinching(false), 100);
     }
