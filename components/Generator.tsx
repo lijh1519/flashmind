@@ -679,12 +679,12 @@ const Generator: React.FC<GeneratorProps> = ({ onDeckCreated, lang, onCameraStat
             <div className="bg-gray-50 px-3 py-2.5 rounded-xl border border-gray-200">
               <div className="flex items-center gap-1 mb-1">
                 <span className="material-symbols-outlined text-xs text-gray-400">speed</span>
-                <span className="text-[10px] text-gray-500">{lang === 'zh' ? '难度' : 'Level'}</span>
+                <span className="text-[10px] text-gray-500">{t.generator.difficulty}</span>
               </div>
               <select value={difficulty} onChange={e => setDifficulty(e.target.value as DifficultyLevel)} className="w-full bg-transparent border-none text-sm font-bold text-accent p-0 focus:ring-0 cursor-pointer">
-                <option value="easy">{lang === 'zh' ? '简单' : 'Easy'}</option>
-                <option value="medium">{lang === 'zh' ? '中等' : 'Medium'}</option>
-                <option value="hard">{lang === 'zh' ? '困难' : 'Hard'}</option>
+                <option value="easy">{t.generator.difficultyEasy}</option>
+                <option value="medium">{t.generator.difficultyMedium}</option>
+                <option value="hard">{t.generator.difficultyHard}</option>
               </select>
             </div>
           </div>
