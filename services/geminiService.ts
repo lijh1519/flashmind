@@ -137,6 +137,15 @@ export const generateMoreCards = async (
 ): Promise<Card[]> => {
   const existingQuestions = existingCards.map((c, i) => `${i + 1}. ${c.front}`).join('\n');
   
+  // 检测原始内容是否有效，无效时从已有卡片构建参考内容
+  const invalidContentMarkers = ['(图片内容)', '（图片内容）', '(image content)', ''];
+  const isContentInvalid = !originalContent || invalidContentMarkers.includes(originalContent.trim());
+  
+  // 如果原文无效，从已有卡片构建参考内容
+  const effectiveContent = isContentInvalid 
+    ? existingCards.map((c, i) => `知识点${i + 1}: ${c.front}\n答案: ${c.back}`).join('\n\n')
+    : originalContent;
+  
   const isZh = language.toLowerCase().includes('chinese') || language === '中文' || language.toLowerCase() === 'zh';
   const difficultyDesc = isZh
     ? difficultyDescriptions[difficulty].zh
@@ -166,9 +175,21 @@ export const generateMoreCards = async (
 严格遵循 JSON 格式：{"cards": [{"front": "问题", "back": "答案"}]}
 语言：${language}`;
 
-  const userPrompt = `请根据以下内容生成 ${quantity} 个新的记忆卡片：
+  const userPrompt = isContentInvalid
+    ? `请基于以下已有知识点，从不同角度生成 ${quantity} 个新的记忆卡片：
 
-${originalContent}
+${effectiveContent}
+
+已有的问题：
+${existingQuestions}
+
+要求：
+1. 从不同认知层级提问（如为什么/如何/关键区别）
+2. 不要完全重复已有问题
+3. 答案基于已有知识点内容`
+    : `请根据以下内容生成 ${quantity} 个新的记忆卡片：
+
+${effectiveContent}
 
 已有的问题：
 ${existingQuestions}
