@@ -72,61 +72,54 @@ const StudyView: React.FC<StudyViewProps> = ({ deck, lang, onExit }) => {
   const currentCard = !isAddCardView ? studyCards[currentIndex] : null;
 
   return (
-    <div className="fixed inset-0 bg-[#FBFDFB] z-[100] flex flex-col safe-area-inset animate-in slide-in-from-right duration-500">
-      <div className="p-6 flex items-center justify-between">
-        <button onClick={onExit} className="w-12 h-12 flex items-center justify-center rounded-2xl bg-white border border-mint-100 text-moss-pale hover:text-moss hover:border-mint-200 hover:shadow-card active:scale-90 transition-all duration-300 shadow-subtle">
+    <div className="fixed inset-0 bg-gray-50 z-[100] flex flex-col safe-area-inset">
+      <div className="p-4 flex items-center justify-between">
+        <button onClick={onExit} className="w-10 h-10 flex items-center justify-center rounded-xl bg-white border border-gray-200 text-gray-500 hover:text-gray-700 active:scale-90 transition-all">
           <span className="material-symbols-outlined">close</span>
         </button>
         
-        <div className="flex items-center gap-1 bg-white rounded-2xl p-1.5 border border-mint-100 shadow-subtle">
-          <button onClick={() => setViewMode('cards')} className={`px-4 py-2 rounded-xl text-xs font-bold transition-all duration-300 flex items-center gap-1.5 ${viewMode === 'cards' ? 'bg-gradient-to-r from-accent/10 to-accent/5 text-accent shadow-sm' : 'text-moss-pale hover:text-moss hover:bg-mint-50'}`}>
+        <div className="flex items-center gap-1 bg-white rounded-xl p-1 border border-gray-200">
+          <button onClick={() => setViewMode('cards')} className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-1 ${viewMode === 'cards' ? 'bg-accent/10 text-accent' : 'text-gray-500 hover:text-gray-700'}`}>
             <span className="material-symbols-outlined text-base">style</span>
-            <span className="hidden sm:inline">{lang === 'zh' ? '卡片' : 'Cards'}</span>
           </button>
-          <button onClick={() => setViewMode('grid')} className={`px-4 py-2 rounded-xl text-xs font-bold transition-all duration-300 flex items-center gap-1.5 ${viewMode === 'grid' ? 'bg-gradient-to-r from-accent/10 to-accent/5 text-accent shadow-sm' : 'text-moss-pale hover:text-moss hover:bg-mint-50'}`}>
+          <button onClick={() => setViewMode('grid')} className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-1 ${viewMode === 'grid' ? 'bg-accent/10 text-accent' : 'text-gray-500 hover:text-gray-700'}`}>
             <span className="material-symbols-outlined text-base">grid_view</span>
-            <span className="hidden sm:inline">{lang === 'zh' ? '网格' : 'Grid'}</span>
           </button>
-          <button onClick={() => setViewMode('list')} className={`px-4 py-2 rounded-xl text-xs font-bold transition-all duration-300 flex items-center gap-1.5 ${viewMode === 'list' ? 'bg-gradient-to-r from-accent/10 to-accent/5 text-accent shadow-sm' : 'text-moss-pale hover:text-moss hover:bg-mint-50'}`}>
+          <button onClick={() => setViewMode('list')} className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-1 ${viewMode === 'list' ? 'bg-accent/10 text-accent' : 'text-gray-500 hover:text-gray-700'}`}>
             <span className="material-symbols-outlined text-base">list</span>
-            <span className="hidden sm:inline">{lang === 'zh' ? '列表' : 'List'}</span>
           </button>
         </div>
         
-        <div className="text-[11px] font-extrabold text-moss-pale tracking-widest bg-white px-3 py-2 rounded-xl border border-mint-100 shadow-subtle">
+        <div className="text-xs font-semibold text-gray-500 bg-white px-3 py-2 rounded-lg border border-gray-200">
           {viewMode === 'cards' ? `${currentIndex + 1}/${studyCards.length}` : `${studyCards.length}`}
         </div>
       </div>
 
       {viewMode === 'cards' ? (
-        <div className="flex-1 flex flex-col px-6 py-4 justify-center animate-in fade-in zoom-in-95 duration-300">
+        <div className="flex-1 flex flex-col px-4 py-4 justify-center">
           {isAddCardView ? (
             /* 添加新问题卡片 */
             <button 
               onClick={handleAddMoreCards}
               disabled={isGenerating}
-              className="relative w-full aspect-[1/1.3] max-h-[520px] group"
+              className="relative w-full aspect-[1/1.3] max-h-[480px] group"
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-mint-50/80 via-white to-mint-100/40 rounded-[40px] border-2 border-dashed border-mint-200/80 shadow-card flex flex-col items-center justify-center text-center overflow-hidden hover:border-accent/60 hover:shadow-card-hover transition-all duration-300">
-                <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-accent/10 to-transparent rounded-full blur-3xl -mr-20 -mt-20"></div>
-                <div className="absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-tr from-primary/10 to-transparent rounded-full blur-3xl -ml-16 -mb-16"></div>
-                
-                <div className="relative z-10 flex flex-col items-center gap-6">
+              <div className="absolute inset-0 bg-white rounded-3xl border-2 border-dashed border-gray-200 shadow-card flex flex-col items-center justify-center text-center hover:border-accent transition-all">
+                <div className="flex flex-col items-center gap-4">
                   {isGenerating ? (
                     <>
-                      <div className="w-20 h-20 rounded-3xl bg-accent/10 flex items-center justify-center">
-                        <span className="material-symbols-outlined text-4xl text-accent animate-spin">progress_activity</span>
+                      <div className="w-16 h-16 rounded-2xl bg-accent/10 flex items-center justify-center">
+                        <span className="material-symbols-outlined text-3xl text-accent animate-spin">progress_activity</span>
                       </div>
-                      <span className="text-lg font-bold text-moss-pale">{lang === 'zh' ? '生成中...' : 'Generating...'}</span>
+                      <span className="text-base font-medium text-gray-500">{lang === 'zh' ? '生成中...' : 'Generating...'}</span>
                     </>
                   ) : (
                     <>
-                      <div className="w-20 h-20 rounded-3xl bg-mint-100/80 flex items-center justify-center group-hover:bg-accent/20 group-hover:scale-110 transition-all duration-300">
-                        <span className="material-symbols-outlined text-4xl text-moss-pale group-hover:text-accent transition-colors">add</span>
+                      <div className="w-16 h-16 rounded-2xl bg-gray-100 flex items-center justify-center group-hover:bg-accent/10 transition-colors">
+                        <span className="material-symbols-outlined text-3xl text-gray-400 group-hover:text-accent transition-colors">add</span>
                       </div>
                       <div className="text-center">
-                        <span className="text-lg font-bold text-moss-pale group-hover:text-accent transition-colors block">{lang === 'zh' ? '添加新问题' : 'Add New Question'}</span>
-                        <span className="text-xs text-moss-pale/60 mt-1">{lang === 'zh' ? '点击生成' : 'Tap to generate'}</span>
+                        <span className="text-base font-medium text-gray-500 group-hover:text-accent transition-colors">{lang === 'zh' ? '添加新问题' : 'Add New Question'}</span>
                       </div>
                     </>
                   )}
@@ -135,40 +128,33 @@ const StudyView: React.FC<StudyViewProps> = ({ deck, lang, onExit }) => {
             </button>
           ) : (
             /* 正常问题卡片 */
-            <div onClick={() => setIsFlipped(!isFlipped)} className="relative w-full aspect-[1/1.3] perspective-1000 max-h-[520px]">
-              <div className={`relative w-full h-full duration-700 preserve-3d transition-transform ${isFlipped ? 'rotate-y-180' : ''}`}>
-                <div className="absolute inset-0 bg-gradient-to-br from-white via-white to-mint-50/40 rounded-[40px] border-2 border-mint-200/60 shadow-card-hover [backface-visibility:hidden] p-12 flex flex-col items-center justify-center text-center overflow-hidden">
-                  <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-accent/8 to-transparent rounded-full blur-3xl -mr-20 -mt-20 animate-pulse-soft"></div>
-                  <div className="absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-tr from-primary/8 to-transparent rounded-full blur-3xl -ml-16 -mb-16 animate-pulse-soft" style={{animationDelay: '1.5s'}}></div>
-                  
-                  <div className="relative z-10 w-full">
-                    <div className="inline-block px-4 py-1.5 bg-accent/5 border border-accent/10 rounded-full mb-8">
-                      <span className="text-[10px] font-bold text-accent uppercase tracking-[0.4em]">{t.study.question}</span>
+            <div onClick={() => setIsFlipped(!isFlipped)} className="relative w-full aspect-[1/1.3] perspective-1000 max-h-[480px]">
+              <div className={`relative w-full h-full duration-500 preserve-3d transition-transform ${isFlipped ? 'rotate-y-180' : ''}`}>
+                <div className="absolute inset-0 bg-white rounded-3xl border border-gray-200 shadow-card [backface-visibility:hidden] p-8 flex flex-col items-center justify-center text-center">
+                  <div className="w-full">
+                    <div className="inline-block px-3 py-1 bg-accent/10 rounded-full mb-6">
+                      <span className="text-xs font-medium text-accent">{t.study.question}</span>
                     </div>
-                    <div className="flex-1 flex items-center justify-center mb-8">
-                      <h3 className="text-2xl md:text-3xl font-bold text-moss leading-snug px-4">{currentCard?.front}</h3>
+                    <div className="flex-1 flex items-center justify-center mb-6">
+                      <h3 className="text-xl font-semibold text-gray-900 leading-relaxed">{currentCard?.front}</h3>
                     </div>
-                    <div className="mt-auto text-[10px] font-bold text-moss-pale uppercase tracking-widest flex items-center gap-2 bg-gradient-to-r from-mint-100/60 to-mint-50/60 backdrop-blur-sm px-5 py-2.5 rounded-full border border-mint-200/40 shadow-subtle mx-auto inline-flex">
-                      <span className="material-symbols-outlined text-base animate-pulse">touch_app</span>
+                    <div className="text-xs text-gray-400 flex items-center gap-1.5 justify-center">
+                      <span className="material-symbols-outlined text-sm">touch_app</span>
                       {t.study.tapReveal}
                     </div>
                   </div>
                 </div>
 
-                <div className="absolute inset-0 bg-gradient-to-br from-accent via-accent to-accent/90 rounded-[40px] shadow-glow-lg rotate-y-180 [backface-visibility:hidden] p-12 flex flex-col items-center justify-center text-center text-white overflow-hidden">
-                  <div className="absolute top-0 left-0 w-48 h-48 bg-white/10 rounded-full blur-3xl -ml-24 -mt-24 animate-float"></div>
-                  <div className="absolute bottom-0 right-0 w-40 h-40 bg-white/10 rounded-full blur-3xl -mr-20 -mb-20 animate-float" style={{animationDelay: '3s'}}></div>
-                  <div className="absolute top-1/2 right-0 w-2 h-32 bg-white/5 blur-xl -mr-1"></div>
-                  
-                  <div className="relative z-10 w-full">
-                    <div className="inline-block px-4 py-1.5 bg-white/10 border border-white/20 backdrop-blur-sm rounded-full mb-8">
-                      <span className="text-[10px] font-bold text-white/80 uppercase tracking-[0.4em]">{t.study.answer}</span>
+                <div className="absolute inset-0 bg-accent rounded-3xl shadow-glow rotate-y-180 [backface-visibility:hidden] p-8 flex flex-col items-center justify-center text-center text-white">
+                  <div className="w-full">
+                    <div className="inline-block px-3 py-1 bg-white/20 rounded-full mb-6">
+                      <span className="text-xs font-medium text-white/90">{t.study.answer}</span>
                     </div>
-                    <div className="flex-1 flex items-center justify-center overflow-y-auto w-full px-2 mb-8 max-h-[300px]">
-                      <div className="text-2xl md:text-3xl leading-relaxed text-white/95">{currentCard?.back}</div>
+                    <div className="flex-1 flex items-center justify-center mb-6 max-h-[280px] overflow-y-auto">
+                      <div className="text-xl leading-relaxed text-white/95">{currentCard?.back}</div>
                     </div>
-                    <div className="mt-auto text-[10px] font-bold text-white/70 uppercase tracking-widest flex items-center gap-2 border border-white/30 backdrop-blur-md px-5 py-2.5 rounded-full bg-white/5 shadow-subtle mx-auto inline-flex">
-                      <span className="material-symbols-outlined text-base">flip</span>
+                    <div className="text-xs text-white/70 flex items-center gap-1.5 justify-center">
+                      <span className="material-symbols-outlined text-sm">flip</span>
                       {t.study.tapFlip}
                     </div>
                   </div>
@@ -178,123 +164,91 @@ const StudyView: React.FC<StudyViewProps> = ({ deck, lang, onExit }) => {
           )}
         </div>
       ) : viewMode === 'grid' ? (
-        <div className="flex-1 overflow-y-auto px-6 py-4 animate-in fade-in slide-in-from-bottom-4 duration-300">
-          <div className="grid grid-cols-2 gap-4 max-w-2xl mx-auto pb-6">
-            {studyCards.map((card, index) => {
-              const colors = [
-                'from-rose-50/80 to-rose-100/40 border-rose-200/60',
-                'from-sky-50/80 to-sky-100/40 border-sky-200/60',
-                'from-mint-50/80 to-mint-100/40 border-mint-200/60',
-                'from-violet-50/80 to-violet-100/40 border-violet-200/60',
-                'from-amber-50/80 to-amber-100/40 border-amber-200/60',
-              ];
-              const colorClass = colors[index % colors.length];
-              return (
-                <div 
-                  key={card.id} 
-                  className={`bg-gradient-to-br ${colorClass} rounded-3xl p-5 border shadow-subtle hover:shadow-card hover:-translate-y-1 transition-all duration-300 cursor-pointer group animate-in fade-in zoom-in-95`}
-                  style={{ animationDelay: `${index * 50}ms` }}
-                  onClick={() => { setCurrentIndex(index); setViewMode('cards'); }}
-                >
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="text-[10px] font-bold text-accent bg-white/60 px-2.5 py-1 rounded-full">{lang === 'zh' ? '问题' : 'Q'} {index + 1}</div>
-                    <span className="material-symbols-outlined text-sm text-moss-pale/50 group-hover:text-accent transition-colors">open_in_full</span>
-                  </div>
-                  <div className="text-sm font-bold text-moss mb-3 line-clamp-3 group-hover:text-moss-light transition-colors">{card.front}</div>
-                  <div className="text-[11px] text-moss-pale line-clamp-2 opacity-70">{card.back}</div>
+        <div className="flex-1 overflow-y-auto px-4 py-4">
+          <div className="grid grid-cols-2 gap-3 max-w-2xl mx-auto pb-6">
+            {studyCards.map((card, index) => (
+              <div 
+                key={card.id} 
+                className="bg-white rounded-2xl p-4 border border-gray-200 shadow-subtle hover:shadow-card transition-all cursor-pointer"
+                onClick={() => { setCurrentIndex(index); setViewMode('cards'); }}
+              >
+                <div className="flex items-center justify-between mb-3">
+                  <div className="text-xs font-medium text-accent bg-accent/10 px-2 py-0.5 rounded-full">{lang === 'zh' ? '问题' : 'Q'} {index + 1}</div>
+                  <span className="material-symbols-outlined text-sm text-gray-400">open_in_full</span>
                 </div>
-              );
-            })}
+                <div className="text-sm font-medium text-gray-900 mb-2 line-clamp-3">{card.front}</div>
+                <div className="text-xs text-gray-500 line-clamp-2">{card.back}</div>
+              </div>
+            ))}
             
-            {/* 添加新问题卡片 - 和普通卡片一样大小 */}
+            {/* 添加新问题卡片 */}
             <button
               onClick={handleAddMoreCards}
               disabled={isGenerating}
-              className="bg-gradient-to-br from-mint-50/50 to-white rounded-3xl p-5 border-2 border-dashed border-mint-200/80 hover:border-accent/60 hover:bg-accent/5 transition-all duration-300 flex flex-col items-center justify-center gap-2 group disabled:opacity-50 min-h-[140px] animate-in fade-in zoom-in-95"
-              style={{ animationDelay: `${studyCards.length * 50}ms` }}
+              className="bg-white rounded-2xl p-4 border-2 border-dashed border-gray-200 hover:border-accent transition-all flex flex-col items-center justify-center gap-2 disabled:opacity-50 min-h-[120px]"
             >
               {isGenerating ? (
                 <>
-                  <div className="w-12 h-12 rounded-2xl bg-accent/10 flex items-center justify-center">
-                    <span className="material-symbols-outlined text-2xl text-accent animate-spin">progress_activity</span>
+                  <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center">
+                    <span className="material-symbols-outlined text-xl text-accent animate-spin">progress_activity</span>
                   </div>
-                  <span className="text-xs font-bold text-moss-pale">{lang === 'zh' ? '生成中...' : 'Generating...'}</span>
+                  <span className="text-xs text-gray-500">{lang === 'zh' ? '生成中...' : 'Generating...'}</span>
                 </>
               ) : (
                 <>
-                  <div className="w-12 h-12 rounded-2xl bg-mint-100/80 flex items-center justify-center group-hover:bg-accent/20 group-hover:scale-110 transition-all duration-300">
-                    <span className="material-symbols-outlined text-2xl text-moss-pale group-hover:text-accent transition-colors">add</span>
+                  <div className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center">
+                    <span className="material-symbols-outlined text-xl text-gray-400">add</span>
                   </div>
-                  <span className="text-xs font-bold text-moss-pale group-hover:text-accent transition-colors">{lang === 'zh' ? '添加新问题' : 'Add'}</span>
+                  <span className="text-xs text-gray-500">{lang === 'zh' ? '添加新问题' : 'Add'}</span>
                 </>
               )}
             </button>
           </div>
         </div>
       ) : (
-        <div className="flex-1 overflow-y-auto px-6 py-4 animate-in fade-in slide-in-from-bottom-4 duration-300">
-          <div className="space-y-3 max-w-2xl mx-auto pb-6">
-            {studyCards.map((card, index) => {
-              const colors = [
-                'from-rose-100/60 to-rose-50/30',
-                'from-sky-100/60 to-sky-50/30',
-                'from-emerald-100/60 to-emerald-50/30',
-                'from-violet-100/60 to-violet-50/30',
-                'from-amber-100/60 to-amber-50/30',
-              ];
-              const dotColors = [
-                'from-rose-200 to-rose-300',
-                'from-sky-200 to-sky-300',
-                'from-emerald-200 to-emerald-300',
-                'from-violet-200 to-violet-300',
-                'from-amber-200 to-amber-300',
-              ];
-              const colorClass = colors[index % colors.length];
-              const dotColor = dotColors[index % dotColors.length];
-              return (
-                <div 
-                  key={card.id} 
-                  className={`bg-gradient-to-r ${colorClass} rounded-2xl border border-white/60 shadow-subtle overflow-hidden animate-in fade-in slide-in-from-left-4`}
-                  style={{ animationDelay: `${index * 60}ms` }}
-                >
-                  <button onClick={() => setExpandedCard(expandedCard === card.id ? null : card.id)} className="w-full p-4 flex items-center gap-4 hover:bg-white/30 transition-all active:scale-[0.99]">
-                    <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${dotColor} flex items-center justify-center flex-shrink-0 shadow-sm`}>
-                      <span className="text-xs font-bold text-white">{index + 1}</span>
-                    </div>
-                    <div className="flex-1 text-left">
-                      <div className="text-sm font-bold text-moss line-clamp-2">{card.front}</div>
-                    </div>
-                    <span className={`material-symbols-outlined text-moss-pale text-xl transition-all duration-300 ${expandedCard === card.id ? 'rotate-180 text-accent' : ''}`}>expand_more</span>
-                  </button>
-                  <div className={`grid transition-all duration-300 ${expandedCard === card.id ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}>
-                    <div className="overflow-hidden">
-                      <div className="px-4 pb-4 pt-2 bg-white/40 border-t border-white/60">
-                        <div className="text-[10px] font-bold text-accent uppercase tracking-wider mb-2">{lang === 'zh' ? '答案' : 'Answer'}</div>
-                        <div className="text-sm text-moss-light leading-relaxed">{card.back}</div>
-                      </div>
+        <div className="flex-1 overflow-y-auto px-4 py-4">
+          <div className="space-y-2 max-w-2xl mx-auto pb-6">
+            {studyCards.map((card, index) => (
+              <div 
+                key={card.id} 
+                className="bg-white rounded-xl border border-gray-200 overflow-hidden"
+              >
+                <button onClick={() => setExpandedCard(expandedCard === card.id ? null : card.id)} className="w-full p-3 flex items-center gap-3 hover:bg-gray-50 transition-all">
+                  <div className="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center flex-shrink-0">
+                    <span className="text-xs font-semibold text-accent">{index + 1}</span>
+                  </div>
+                  <div className="flex-1 text-left">
+                    <div className="text-sm font-medium text-gray-900 line-clamp-2">{card.front}</div>
+                  </div>
+                  <span className={`material-symbols-outlined text-gray-400 text-lg transition-transform ${expandedCard === card.id ? 'rotate-180 text-accent' : ''}`}>expand_more</span>
+                </button>
+                <div className={`grid transition-all ${expandedCard === card.id ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}>
+                  <div className="overflow-hidden">
+                    <div className="px-3 pb-3 pt-2 bg-gray-50 border-t border-gray-100">
+                      <div className="text-xs font-medium text-accent mb-1">{lang === 'zh' ? '答案' : 'Answer'}</div>
+                      <div className="text-sm text-gray-600">{card.back}</div>
                     </div>
                   </div>
                 </div>
-              );
-            })}
+              </div>
+            ))}
             
-            {/* 添加新问题 - 列表项样式 */}
+            {/* 添加新问题 */}
             <button
               onClick={handleAddMoreCards}
               disabled={isGenerating}
-              className="w-full bg-gradient-to-r from-mint-50/50 to-white rounded-2xl border-2 border-dashed border-mint-200/80 hover:border-accent/60 hover:bg-accent/5 transition-all duration-300 overflow-hidden group disabled:opacity-50 animate-in fade-in slide-in-from-left-4"
-              style={{ animationDelay: `${studyCards.length * 60}ms` }}
+              className="w-full bg-white rounded-xl border-2 border-dashed border-gray-200 hover:border-accent transition-all disabled:opacity-50"
             >
-              <div className="p-4 flex items-center gap-4">
-                <div className="w-10 h-10 rounded-xl bg-mint-100/80 flex items-center justify-center flex-shrink-0 group-hover:bg-accent/20 group-hover:scale-110 transition-all duration-300">
+              <div className="p-3 flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
                   {isGenerating ? (
-                    <span className="material-symbols-outlined text-lg text-accent animate-spin">progress_activity</span>
+                    <span className="material-symbols-outlined text-sm text-accent animate-spin">progress_activity</span>
                   ) : (
-                    <span className="material-symbols-outlined text-lg text-moss-pale group-hover:text-accent transition-colors">add</span>
+                    <span className="material-symbols-outlined text-sm text-gray-400">add</span>
                   )}
                 </div>
                 <div className="flex-1 text-left">
-                  <div className="text-sm font-bold text-moss-pale group-hover:text-accent transition-colors">
+                  <div className="text-sm text-gray-500">
                     {isGenerating ? (lang === 'zh' ? '生成中...' : 'Generating...') : (lang === 'zh' ? '添加新问题' : 'Add New Question')}
                   </div>
                 </div>
@@ -305,60 +259,47 @@ const StudyView: React.FC<StudyViewProps> = ({ deck, lang, onExit }) => {
       )}
 
       {viewMode === 'cards' && (
-        <div className="p-6 pb-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <div className="p-4 pb-8">
           {/* 轮播导航栏 */}
-          <div className="flex items-center justify-center gap-4 bg-white/80 backdrop-blur-xl rounded-full px-6 py-4 shadow-card border border-mint-100/60 max-w-sm mx-auto">
+          <div className="flex items-center justify-center gap-3 bg-white rounded-full px-4 py-3 shadow-card border border-gray-100 max-w-xs mx-auto">
             {/* 左箭头 */}
             <button 
               onClick={handlePrev} 
               disabled={currentIndex === 0} 
-              className="w-10 h-10 rounded-full bg-mint-50 flex items-center justify-center text-moss-pale hover:text-moss hover:bg-mint-100 active:scale-90 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+              className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 hover:bg-gray-200 active:scale-90 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
             >
-              <span className="material-symbols-outlined text-xl">chevron_left</span>
+              <span className="material-symbols-outlined text-lg">chevron_left</span>
             </button>
             
             {/* 进度显示 */}
-            <span className="text-sm font-bold text-moss-pale tabular-nums min-w-[40px] text-center">
-              {isAddCardView ? '+' : `${currentIndex + 1} / ${studyCards.length}`}
+            <span className="text-sm font-medium text-gray-500 min-w-[40px] text-center">
+              {isAddCardView ? '+' : `${currentIndex + 1}/${studyCards.length}`}
             </span>
             
             {/* 圆点指示器 */}
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-1">
               {studyCards.map((_, index) => (
                 <button
                   key={index}
                   onClick={() => { setIsFlipped(false); setCurrentIndex(index); }}
-                  className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
-                    index === currentIndex && !isAddCardView
-                      ? 'bg-accent scale-125' 
-                      : 'bg-mint-200 hover:bg-mint-300'
-                  }`}
+                  className={`w-2 h-2 rounded-full transition-all ${index === currentIndex && !isAddCardView ? 'bg-accent scale-125' : 'bg-gray-300 hover:bg-gray-400'}`}
                 />
               ))}
               
-              {/* 添加新问题按钮 - 虚线圆圈 */}
+              {/* 添加新问题按钮 */}
               <button
                 onClick={() => setCurrentIndex(studyCards.length)}
-                className={`w-2.5 h-2.5 rounded-full border border-dashed transition-all duration-300 flex items-center justify-center ${
-                  isAddCardView 
-                    ? 'border-accent bg-accent/20 scale-125' 
-                    : 'border-accent/60 hover:border-accent hover:bg-accent/10'
-                }`}
-                title={lang === 'zh' ? '添加新问题' : 'Add new question'}
-              >
-                {isGenerating && (
-                  <span className="w-1 h-1 bg-accent rounded-full animate-ping"></span>
-                )}
-              </button>
+                className={`w-2 h-2 rounded-full border border-dashed transition-all ${isAddCardView ? 'border-accent bg-accent/20 scale-125' : 'border-gray-400 hover:border-accent'}`}
+              />
             </div>
             
             {/* 右箭头 */}
             <button 
               onClick={handleNext}
               disabled={isAddCardView}
-              className="w-10 h-10 rounded-full bg-accent flex items-center justify-center text-white hover:bg-accent/90 active:scale-90 transition-all shadow-sm disabled:opacity-30 disabled:cursor-not-allowed"
+              className="w-9 h-9 rounded-full bg-accent flex items-center justify-center text-white hover:bg-accent/90 active:scale-90 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
             >
-              <span className="material-symbols-outlined text-xl">chevron_right</span>
+              <span className="material-symbols-outlined text-lg">chevron_right</span>
             </button>
           </div>
         </div>

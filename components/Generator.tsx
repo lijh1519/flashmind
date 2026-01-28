@@ -41,6 +41,27 @@ const Generator: React.FC<GeneratorProps> = ({ onDeckCreated, lang, onCameraStat
     setGenLanguage(lang === 'zh' ? 'Chinese' : 'English');
   }, [lang]);
 
+  // 拍照时禁止页面滚动
+  useEffect(() => {
+    if (showCamera) {
+      document.body.style.overflow = 'hidden';
+      document.body.style.position = 'fixed';
+      document.body.style.width = '100%';
+      document.body.style.height = '100%';
+    } else {
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+      document.body.style.height = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+      document.body.style.height = '';
+    };
+  }, [showCamera]);
+
   const startCamera = async () => {
     setShowCamera(true);
     onCameraStateChange?.(true);
@@ -322,46 +343,66 @@ const Generator: React.FC<GeneratorProps> = ({ onDeckCreated, lang, onCameraStat
   };
 
   return (
-    <div className="max-w-md mx-auto px-4 pt-16 pb-24 animate-in fade-in slide-in-from-bottom-4 duration-700">
-      {/* Hero */}
-      <div className="text-center mb-8 relative">
-        {/* 浮动装饰 */}
-        <div className="absolute -top-8 left-1/4 w-16 h-16 bg-gradient-to-br from-accent/20 to-accent/5 rounded-full blur-xl animate-float" style={{animationDelay: '0s'}}></div>
-        <div className="absolute -top-4 right-1/4 w-12 h-12 bg-gradient-to-br from-amber-200/30 to-transparent rounded-full blur-lg animate-float" style={{animationDelay: '1s'}}></div>
-        <div className="absolute top-16 -left-4 w-8 h-8 bg-gradient-to-br from-sky-200/30 to-transparent rounded-full blur-md animate-float" style={{animationDelay: '2s'}}></div>
-        
-        <div className="inline-block px-4 py-1.5 bg-gradient-to-r from-accent/10 to-accent/5 rounded-full border border-accent/20 text-[10px] font-bold text-accent uppercase tracking-widest mb-5 animate-pulse-soft">
-          <span className="inline-flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 bg-accent rounded-full animate-ping"></span>
+    <div className="max-w-md mx-auto px-4 pt-12 pb-24">
+      {/* Hero with Illustration */}
+      <div className="flex items-center gap-4 mb-6">
+        {/* 文案 */}
+        <div className="flex-1">
+          <div className="inline-block px-3 py-1 bg-accent/10 rounded-full text-[11px] font-semibold text-accent mb-2">
             {t.hero.tag}
-          </span>
+          </div>
+          <h1 className="text-2xl font-bold text-gray-900 mb-1">
+            {t.hero.titlePrefix}<span className="text-accent">{t.hero.titleItalic}</span>{t.hero.titleSuffix}
+          </h1>
+          <p className="text-sm text-gray-500">
+            {t.hero.subtitle}
+          </p>
         </div>
-        <h1 className="text-4xl font-bold text-moss tracking-tight mb-3 relative">
-          {t.hero.titlePrefix}<span className="text-accent relative">{t.hero.titleItalic}<span className="absolute -bottom-1 left-0 right-0 h-2 bg-accent/10 -skew-x-6 rounded"></span></span>{t.hero.titleSuffix}
-        </h1>
-        <p className="text-sm text-moss-light leading-relaxed font-medium opacity-70">
-          {t.hero.subtitle}
-        </p>
+        
+        {/* 可爱的学习插画 */}
+        <div className="relative w-28 h-28 flex-shrink-0">
+          <img 
+            src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14/assets/svg/1f4da.svg" 
+            alt="Books" 
+            className="absolute w-7 h-7 top-0 left-0 animate-float"
+          />
+          <img 
+            src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14/assets/svg/1f9d1-200d-1f4bb.svg" 
+            alt="Student" 
+            className="absolute w-14 h-14 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+          />
+          <img 
+            src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14/assets/svg/1f4a1.svg" 
+            alt="Idea" 
+            className="absolute w-6 h-6 top-1 right-1 animate-float"
+            style={{animationDelay: '0.5s'}}
+          />
+          <img 
+            src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14/assets/svg/2728.svg" 
+            alt="Sparkles" 
+            className="absolute w-5 h-5 bottom-2 right-2 animate-float"
+            style={{animationDelay: '1s'}}
+          />
+        </div>
       </div>
 
       {/* Creation Area */}
-      <div className="bg-gradient-to-br from-white via-white to-mint-50/30 rounded-[36px] border border-mint-100/60 shadow-card overflow-hidden relative">
-        {/* 背景装饰 */}
-        <div className="absolute top-0 right-0 w-48 h-48 bg-gradient-to-br from-accent/5 to-transparent rounded-full blur-3xl -mr-24 -mt-24 pointer-events-none"></div>
-        <div className="absolute bottom-0 left-0 w-40 h-40 bg-gradient-to-tr from-primary/5 to-transparent rounded-full blur-3xl -ml-20 -mb-20 pointer-events-none"></div>
-        
-        <div className="p-6 relative z-10">
+      <div className="bg-white rounded-3xl border border-gray-200 shadow-card overflow-hidden">
+        <div className="p-5">
           {/* Camera Overlay */}
           {showCamera && (
-            <div className="fixed inset-0 z-[100] bg-black flex flex-col">
+            <div 
+              className="fixed inset-0 z-[100] bg-black flex flex-col overflow-hidden"
+              style={{ touchAction: 'none' }}
+            >
               {/* 可点击拍照的视频区域 */}
               <div 
-                className="flex-1 relative"
+                className="flex-1 relative overflow-hidden"
                 onTouchStart={handleTouchStart}
-                onTouchMove={handleTouchMove}
+                onTouchMove={(e) => { e.preventDefault(); handleTouchMove(e); }}
                 onTouchEnd={handleTouchEnd}
               >
-                <video ref={videoRef} autoPlay playsInline className="w-full h-full object-cover" />
+                <video ref={videoRef} autoPlay playsInline muted className="absolute inset-0 w-full h-full object-cover" />
                 
                 {/* 快门闪烁效果 */}
                 {showFlash && (
@@ -509,24 +550,17 @@ const Generator: React.FC<GeneratorProps> = ({ onDeckCreated, lang, onCameraStat
               )}
             </div>
           ) : (
-            <div className="flex gap-4 mb-6">
+            <div className="flex gap-3 mb-5">
               <button 
                 onClick={startCamera}
-                className="group flex-1 h-40 bg-gradient-to-br from-accent via-accent to-accent/90 rounded-[28px] flex flex-col items-center justify-center gap-3 text-white shadow-glow hover:shadow-glow-lg hover:-translate-y-1 active:scale-[0.97] active:translate-y-0 transition-all duration-300 relative overflow-hidden"
+                className="flex-1 h-32 bg-accent rounded-2xl flex flex-col items-center justify-center gap-2 text-white shadow-glow hover:shadow-glow-lg active:scale-[0.98] transition-all"
               >
-                <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent"></div>
-                <div className="absolute inset-0 bg-white/0 group-hover:bg-white/10 transition-colors duration-300"></div>
-                <div className="absolute top-3 right-3 w-8 h-8 bg-white/20 rounded-full blur-xl group-hover:scale-150 transition-transform duration-500"></div>
-                <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm relative z-10 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300">
-                  <span className="material-symbols-outlined text-3xl">photo_camera</span>
+                <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+                  <span className="material-symbols-outlined text-2xl">photo_camera</span>
                 </div>
-                <div className="relative z-10 text-center">
-                  <span className="text-sm font-bold block">{t.generator.camera}</span>
-                  <span className="text-[10px] text-white/60 tracking-wide">拍摄书籍文章</span>
-                </div>
+                <span className="text-sm font-semibold">{t.generator.camera}</span>
               </button>
-              <label className="group flex-1 h-40 bg-gradient-to-br from-mint-50 via-white to-mint-100/50 border-2 border-dashed border-mint-200/80 hover:border-accent/40 rounded-[28px] flex flex-col items-center justify-center gap-3 text-moss-pale hover:text-accent hover:-translate-y-1 active:scale-[0.97] active:translate-y-0 transition-all duration-300 cursor-pointer relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-accent/0 to-accent/0 group-hover:from-accent/5 group-hover:to-transparent transition-colors duration-300"></div>
+              <label className="flex-1 h-32 bg-gray-50 border-2 border-dashed border-gray-200 hover:border-accent hover:bg-accent/5 rounded-2xl flex flex-col items-center justify-center gap-2 text-gray-500 hover:text-accent active:scale-[0.98] transition-all cursor-pointer">
                 <input 
                   type="file" 
                   accept="image/*,application/pdf" 
@@ -538,107 +572,101 @@ const Generator: React.FC<GeneratorProps> = ({ onDeckCreated, lang, onCameraStat
                     }
                   }} 
                 />
-                <div className="w-16 h-16 bg-gradient-to-br from-mint-100 to-mint-50 rounded-2xl flex items-center justify-center relative z-10 group-hover:scale-110 group-hover:-rotate-6 transition-all duration-300 border border-mint-200/60">
-                  <span className="material-symbols-outlined text-3xl text-moss-pale group-hover:text-accent transition-colors">upload_file</span>
+                <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center">
+                  <span className="material-symbols-outlined text-2xl">upload_file</span>
                 </div>
-                <div className="relative z-10 text-center">
-                  <span className="text-sm font-bold block group-hover:text-accent transition-colors">{t.generator.upload}</span>
-                  <span className="text-[10px] text-moss-pale/60 tracking-wide">图片/PDF</span>
-                </div>
+                <span className="text-sm font-semibold">{t.generator.upload}</span>
               </label>
             </div>
           )}
 
           {/* 标题栏 */}
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-lg font-bold text-moss">{t.generator.label}</h2>
+            <h2 className="text-base font-semibold text-gray-900">{t.generator.label}</h2>
             <button 
               onClick={() => setShowSamples(!showSamples)}
-              className={`flex items-center gap-1.5 text-[11px] font-bold transition-all duration-300 px-3 py-1.5 rounded-full ${showSamples ? 'bg-accent/10 text-accent' : 'text-accent/70 hover:text-accent hover:bg-accent/5'}`}
+              className={`flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-lg transition-colors ${showSamples ? 'bg-accent/10 text-accent' : 'text-gray-500 hover:text-accent'}`}
             >
-              <span className={`material-symbols-outlined text-base transition-transform duration-300 ${showSamples ? 'rotate-180' : ''}`}>auto_awesome</span>
-              <span>{t.generator.samples}</span>
+              <span className={`material-symbols-outlined text-sm ${showSamples ? 'rotate-180' : ''}`}>auto_awesome</span>
+              {t.generator.samples}
             </button>
           </div>
 
           {/* 示例列表 */}
           {showSamples && (
-            <div className="mb-4 space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
+            <div className="mb-4 space-y-2">
               <button 
                 onClick={() => { setContent(t.generator.sample1); setShowSamples(false); }}
-                className="w-full text-left p-4 bg-gradient-to-r from-emerald-50 to-emerald-100/50 hover:from-emerald-100 hover:to-emerald-50 rounded-2xl border border-emerald-200/60 text-sm text-moss transition-all active:scale-[0.98] group flex items-center gap-3"
-                style={{ animationDelay: '0ms' }}
+                className="w-full text-left p-3 bg-emerald-50 hover:bg-emerald-100 rounded-xl border border-emerald-200 text-sm transition-colors flex items-center gap-3"
               >
-                <div className="w-10 h-10 bg-gradient-to-br from-emerald-200 to-emerald-300 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
-                  <span className="material-symbols-outlined text-white text-lg">biotech</span>
+                <div className="w-9 h-9 bg-emerald-200 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <span className="material-symbols-outlined text-white text-base">biotech</span>
                 </div>
                 <div>
-                  <span className="font-bold block">{lang === 'zh' ? '生物学：线粒体' : 'Biology: Mitochondria'}</span>
-                  <span className="text-xs text-moss-pale">{lang === 'zh' ? '细胞的动力工厂' : 'Cell powerhouse'}</span>
+                  <span className="font-semibold text-gray-900 block text-sm">{lang === 'zh' ? '生物学：线粒体' : 'Biology: Mitochondria'}</span>
+                  <span className="text-xs text-gray-500">{lang === 'zh' ? '细胞的动力工厂' : 'Cell powerhouse'}</span>
                 </div>
               </button>
               <button 
                 onClick={() => { setContent(t.generator.sample2); setShowSamples(false); }}
-                className="w-full text-left p-4 bg-gradient-to-r from-violet-50 to-violet-100/50 hover:from-violet-100 hover:to-violet-50 rounded-2xl border border-violet-200/60 text-sm text-moss transition-all active:scale-[0.98] group flex items-center gap-3"
-                style={{ animationDelay: '50ms' }}
+                className="w-full text-left p-3 bg-violet-50 hover:bg-violet-100 rounded-xl border border-violet-200 text-sm transition-colors flex items-center gap-3"
               >
-                <div className="w-10 h-10 bg-gradient-to-br from-violet-200 to-violet-300 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
-                  <span className="material-symbols-outlined text-white text-lg">code</span>
+                <div className="w-9 h-9 bg-violet-200 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <span className="material-symbols-outlined text-white text-base">code</span>
                 </div>
                 <div>
-                  <span className="font-bold block">{lang === 'zh' ? '编程：Python 装饰器' : 'Programming: Python Decorators'}</span>
-                  <span className="text-xs text-moss-pale">{lang === 'zh' ? '设计模式精髓' : 'Design pattern essentials'}</span>
+                  <span className="font-semibold text-gray-900 block text-sm">{lang === 'zh' ? '编程：Python 装饰器' : 'Programming: Python Decorators'}</span>
+                  <span className="text-xs text-gray-500">{lang === 'zh' ? '设计模式精髓' : 'Design pattern essentials'}</span>
                 </div>
               </button>
               <button 
                 onClick={() => { setContent(t.generator.sample3); setShowSamples(false); }}
-                className="w-full text-left p-4 bg-gradient-to-r from-amber-50 to-amber-100/50 hover:from-amber-100 hover:to-amber-50 rounded-2xl border border-amber-200/60 text-sm text-moss transition-all active:scale-[0.98] group flex items-center gap-3"
-                style={{ animationDelay: '100ms' }}
+                className="w-full text-left p-3 bg-amber-50 hover:bg-amber-100 rounded-xl border border-amber-200 text-sm transition-colors flex items-center gap-3"
               >
-                <div className="w-10 h-10 bg-gradient-to-br from-amber-200 to-amber-300 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
-                  <span className="material-symbols-outlined text-white text-lg">sailing</span>
+                <div className="w-9 h-9 bg-amber-200 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <span className="material-symbols-outlined text-white text-base">sailing</span>
                 </div>
                 <div>
-                  <span className="font-bold block">{lang === 'zh' ? '历史：大航海时代' : 'History: Age of Discovery'}</span>
-                  <span className="text-xs text-moss-pale">{lang === 'zh' ? '探索世界的开端' : 'World exploration begins'}</span>
+                  <span className="font-semibold text-gray-900 block text-sm">{lang === 'zh' ? '历史：大航海时代' : 'History: Age of Discovery'}</span>
+                  <span className="text-xs text-gray-500">{lang === 'zh' ? '探索世界的开端' : 'World exploration begins'}</span>
                 </div>
               </button>
             </div>
           )}
 
-          <div className="relative mb-6">
+          <div className="mb-5">
             <textarea
               value={content}
               onChange={(e) => setContent(e.target.value)}
               placeholder={t.generator.placeholder}
-              className="w-full bg-white/80 border border-mint-100 rounded-3xl p-6 text-base text-moss placeholder:text-moss-pale/40 min-h-[140px] focus:ring-4 focus:ring-accent/10 focus:border-accent/30 focus:bg-white transition-all resize-none shadow-subtle"
+              className="w-full bg-gray-50 border border-gray-200 rounded-xl p-4 text-sm text-gray-900 placeholder:text-gray-400 min-h-[120px] focus:ring-2 focus:ring-accent/20 focus:border-accent focus:bg-white transition-all resize-none"
             />
             {content && (
-              <div className="absolute bottom-4 right-4 text-[10px] text-moss-pale font-bold">
+              <div className="mt-1 text-right text-xs text-gray-400">
                 {content.length} {lang === 'zh' ? '字' : 'chars'}
               </div>
             )}
           </div>
 
           {/* Settings Group */}
-          <div className="flex gap-4 mb-8">
-            <div className="flex-1 bg-gradient-to-br from-mint-50/80 to-mint-100/40 px-5 py-4 rounded-2xl border border-mint-200/50 flex items-center justify-between shadow-subtle hover:shadow-card hover:-translate-y-0.5 transition-all duration-300 group">
+          <div className="flex gap-3 mb-5">
+            <div className="flex-1 bg-gray-50 px-4 py-3 rounded-xl border border-gray-200 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-sm text-moss-pale group-hover:text-accent transition-colors">format_list_numbered</span>
-                <span className="text-xs font-bold text-moss uppercase tracking-wider">{t.generator.max}</span>
+                <span className="material-symbols-outlined text-sm text-gray-400">format_list_numbered</span>
+                <span className="text-xs font-medium text-gray-600">{t.generator.max}</span>
               </div>
-              <select value={quantity} onChange={e => setQuantity(Number(e.target.value))} className="bg-transparent border-none text-lg font-extrabold text-accent p-0 pr-6 focus:ring-0 cursor-pointer -mr-3">
+              <select value={quantity} onChange={e => setQuantity(Number(e.target.value))} className="bg-transparent border-none text-base font-bold text-accent p-0 pr-4 focus:ring-0 cursor-pointer">
                 <option value={5}>5</option>
                 <option value={10}>10</option>
                 <option value={20}>20</option>
               </select>
             </div>
-            <div className="flex-1 bg-gradient-to-br from-rose-50/80 to-rose-100/40 px-5 py-4 rounded-2xl border border-rose-200/50 flex items-center justify-between shadow-subtle hover:shadow-card hover:-translate-y-0.5 transition-all duration-300 group">
+            <div className="flex-1 bg-gray-50 px-4 py-3 rounded-xl border border-gray-200 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-sm text-moss-pale group-hover:text-accent transition-colors">translate</span>
-                <span className="text-xs font-bold text-moss uppercase tracking-wider">{t.generator.langLabel}</span>
+                <span className="material-symbols-outlined text-sm text-gray-400">translate</span>
+                <span className="text-xs font-medium text-gray-600">{t.generator.langLabel}</span>
               </div>
-              <select value={genLanguage} onChange={e => setGenLanguage(e.target.value)} className="bg-transparent border-none text-lg font-extrabold text-accent p-0 pr-6 focus:ring-0 cursor-pointer -mr-3">
+              <select value={genLanguage} onChange={e => setGenLanguage(e.target.value)} className="bg-transparent border-none text-base font-bold text-accent p-0 pr-4 focus:ring-0 cursor-pointer">
                 <option value="Chinese">中</option>
                 <option value="English">EN</option>
               </select>
@@ -648,22 +676,17 @@ const Generator: React.FC<GeneratorProps> = ({ onDeckCreated, lang, onCameraStat
           <button 
             onClick={handleCreate}
             disabled={loading || (!content.trim() && capturedImages.length === 0)}
-            className="w-full py-5 bg-gradient-to-r from-moss via-moss to-moss/90 text-white rounded-3xl font-bold flex items-center justify-center gap-3 shadow-card hover:shadow-glow hover:-translate-y-1 active:scale-[0.98] active:translate-y-0 transition-all duration-300 disabled:opacity-40 disabled:grayscale disabled:cursor-not-allowed disabled:hover:translate-y-0 relative overflow-hidden group"
+            className="w-full py-4 bg-gray-900 hover:bg-gray-800 text-white rounded-xl font-semibold flex items-center justify-center gap-2 shadow-card active:scale-[0.98] transition-all disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-700"></div>
-            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-              <div className="absolute top-0 left-1/4 w-1 h-full bg-white/10 blur-sm"></div>
-              <div className="absolute top-0 right-1/3 w-1 h-full bg-white/10 blur-sm"></div>
-            </div>
             {loading ? (
-               <div className="flex items-center gap-3 relative z-10">
-                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                 <span className="text-sm tracking-widest uppercase">{t.generator.generating}</span>
+               <div className="flex items-center gap-2">
+                 <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                 <span className="text-sm">{t.generator.generating}</span>
                </div>
             ) : (
-              <div className="flex items-center gap-2 relative z-10">
-                <span className="material-symbols-outlined text-xl group-hover:rotate-12 transition-transform">auto_awesome</span>
-                <span className="text-sm tracking-[0.15em] font-extrabold uppercase">{t.generator.generate}</span>
+              <div className="flex items-center gap-2">
+                <span className="material-symbols-outlined text-lg">auto_awesome</span>
+                <span className="text-sm">{t.generator.generate}</span>
               </div>
             )}
           </button>
