@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="theme-color" content="#F7FBF9" />
+  <meta name="theme-color" content="#f9f0db" />
   <title>FlashMind AI - Snap & Learn</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -19,8 +19,14 @@
       theme: {
         extend: {
           colors: {
-            primary: "#059669",
-            accent: "#10B981",
+            primary: "#6b8f7a",
+            accent: "#83a696",
+            coral: "#f15154",
+            cream: {
+              DEFAULT: "#f9f0db",
+              light: "#fdf8ed",
+              dark: "#f0e4c8",
+            },
             moss: {
               DEFAULT: "#1F2937",
               light: "#374151",
@@ -28,15 +34,15 @@
               deep: "#111827"
             },
             mint: {
-              5: "#F9FAFB",
-              50: "#F0FDF4",
-              100: "#DCFCE7",
-              200: "#BBF7D0",
+              5: "#fdfbf5",
+              50: "#f9f0db",
+              100: "#f0e4c8",
+              200: "#e5d6b0",
             },
             rose: {
-              50: "#FFF1F2",
-              100: "#FFE4E6",
-              200: "#FECDD3",
+              50: "#FFF5F5",
+              100: "#FED7D7",
+              200: "#FEB2B2",
             },
           },
           fontFamily: {
@@ -44,24 +50,38 @@
             serif: ["Instrument Serif", "serif"],
           },
           boxShadow: {
-            'glow': '0 4px 14px -2px rgba(16, 185, 129, 0.25)',
-            'glow-lg': '0 10px 25px -3px rgba(16, 185, 129, 0.3)',
-            'subtle': '0 1px 3px rgba(0, 0, 0, 0.08)',
-            'card': '0 4px 12px -2px rgba(0, 0, 0, 0.08)',
-            'card-hover': '0 8px 25px -5px rgba(0, 0, 0, 0.12)',
+            'glow': '0 4px 14px -2px rgba(131, 166, 150, 0.3)',
+            'glow-lg': '0 10px 25px -3px rgba(131, 166, 150, 0.35)',
+            'coral-glow': '0 4px 14px -2px rgba(241, 81, 84, 0.25)',
+            'subtle': '0 1px 3px rgba(0, 0, 0, 0.06)',
+            'card': '0 4px 20px -4px rgba(0, 0, 0, 0.08)',
+            'card-hover': '0 12px 35px -8px rgba(0, 0, 0, 0.15)',
+            '3d': '0 20px 40px -15px rgba(0, 0, 0, 0.2)',
           },
           animation: {
             'float': 'float 6s ease-in-out infinite',
+            'float-slow': 'float 8s ease-in-out infinite',
             'pulse-soft': 'pulse-soft 3s ease-in-out infinite',
+            'spin-slow': 'spin 20s linear infinite',
+            'bounce-soft': 'bounce-soft 2s ease-in-out infinite',
+            'tilt': 'tilt 10s ease-in-out infinite',
           },
           keyframes: {
             float: {
               '0%, 100%': { transform: 'translateY(0px)' },
-              '50%': { transform: 'translateY(-6px)' },
+              '50%': { transform: 'translateY(-8px)' },
             },
             'pulse-soft': {
               '0%, 100%': { opacity: '0.7' },
               '50%': { opacity: '1' },
+            },
+            'bounce-soft': {
+              '0%, 100%': { transform: 'translateY(0)' },
+              '50%': { transform: 'translateY(-4px)' },
+            },
+            'tilt': {
+              '0%, 100%': { transform: 'rotateY(-8deg) rotateX(5deg)' },
+              '50%': { transform: 'rotateY(8deg) rotateX(-5deg)' },
             },
           },
         },
@@ -73,7 +93,7 @@
       body {
         font-family: 'Plus Jakarta Sans', sans-serif;
         -webkit-tap-highlight-color: transparent;
-        @apply bg-[#FBFDFB] text-moss;
+        @apply bg-cream-light text-moss;
       }
       .serif-text {
         font-family: 'Instrument Serif', serif;

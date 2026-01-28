@@ -348,51 +348,65 @@ const Generator: React.FC<GeneratorProps> = ({ onDeckCreated, lang, onCameraStat
   };
 
   return (
-    <div className="max-w-md mx-auto px-4 pt-12 pb-24">
-      {/* Hero with Illustration */}
-      <div className="flex items-center gap-4 mb-6">
-        {/* 文案 */}
-        <div className="flex-1">
-          <div className="inline-block px-3 py-1 bg-accent/10 rounded-full text-[11px] font-semibold text-accent mb-2">
-            {t.hero.tag}
-          </div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-1">
-            {t.hero.titlePrefix}<span className="text-accent">{t.hero.titleItalic}</span>{t.hero.titleSuffix}
-          </h1>
-          <p className="text-sm text-gray-500">
-            {t.hero.subtitle}
-          </p>
-        </div>
+    <div className="max-w-md mx-auto px-4 pt-8 pb-24">
+      {/* 3D Hero Section */}
+      <div className="relative mb-8">
+        {/* 背景装饰 */}
+        <div className="absolute -top-4 -left-4 w-32 h-32 bg-gradient-to-br from-accent/20 to-accent/5 rounded-full blur-2xl"></div>
+        <div className="absolute -bottom-4 -right-4 w-24 h-24 bg-gradient-to-br from-coral/15 to-coral/5 rounded-full blur-2xl"></div>
         
-        {/* 可爱的学习插画 */}
-        <div className="relative w-28 h-28 flex-shrink-0">
-          <img 
-            src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14/assets/svg/1f4da.svg" 
-            alt="Books" 
-            className="absolute w-7 h-7 top-0 left-0 animate-float"
-          />
-          <img 
-            src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14/assets/svg/1f9d1-200d-1f4bb.svg" 
-            alt="Student" 
-            className="absolute w-14 h-14 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
-          />
-          <img 
-            src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14/assets/svg/1f4a1.svg" 
-            alt="Idea" 
-            className="absolute w-6 h-6 top-1 right-1 animate-float"
-            style={{animationDelay: '0.5s'}}
-          />
-          <img 
-            src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14/assets/svg/2728.svg" 
-            alt="Sparkles" 
-            className="absolute w-5 h-5 bottom-2 right-2 animate-float"
-            style={{animationDelay: '1s'}}
-          />
+        {/* 3D 卡片容器 */}
+        <div className="relative perspective-1000">
+          <div className="relative bg-gradient-to-br from-white via-cream-light to-cream rounded-3xl p-6 shadow-3d border border-white/60 animate-tilt" style={{transformStyle: 'preserve-3d'}}>
+            {/* 内容 */}
+            <div className="relative z-10">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-accent/15 rounded-full">
+                  <span className="w-1.5 h-1.5 bg-accent rounded-full animate-pulse"></span>
+                  <span className="text-[11px] font-bold text-accent tracking-wide">{t.hero.tag}</span>
+                </div>
+              </div>
+              
+              <h1 className="text-3xl font-extrabold text-moss mb-2 tracking-tight">
+                {t.hero.titlePrefix}
+                <span className="relative">
+                  <span className="text-coral">{t.hero.titleItalic}</span>
+                  <svg className="absolute -bottom-1 left-0 w-full" height="6" viewBox="0 0 40 6" fill="none">
+                    <path d="M2 4C10 2 30 2 38 4" stroke="#f15154" strokeWidth="2" strokeLinecap="round" className="animate-pulse"/>
+                  </svg>
+                </span>
+                {t.hero.titleSuffix}
+              </h1>
+              
+              <p className="text-sm text-moss-pale leading-relaxed">
+                {t.hero.subtitle}
+              </p>
+            </div>
+            
+            {/* 3D 浮动元素 */}
+            <div className="absolute -top-3 -right-2" style={{transform: 'translateZ(30px)'}}>
+              <div className="w-14 h-14 bg-gradient-to-br from-coral to-coral/80 rounded-2xl shadow-coral-glow flex items-center justify-center animate-bounce-soft rotate-12">
+                <span className="text-2xl">✨</span>
+              </div>
+            </div>
+            
+            <div className="absolute -bottom-2 -left-2" style={{transform: 'translateZ(20px)'}}>
+              <div className="w-12 h-12 bg-gradient-to-br from-accent to-accent/80 rounded-xl shadow-glow flex items-center justify-center animate-float -rotate-6">
+                <span className="text-xl">📚</span>
+              </div>
+            </div>
+            
+            <div className="absolute top-1/2 -right-4" style={{transform: 'translateZ(15px) translateY(-50%)'}}>
+              <div className="w-8 h-8 bg-cream rounded-lg shadow-subtle flex items-center justify-center animate-float-slow rotate-12" style={{animationDelay: '0.5s'}}>
+                <span className="text-sm">💡</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
       {/* Creation Area */}
-      <div className="bg-white rounded-3xl border border-gray-200 shadow-card overflow-hidden">
+      <div className="bg-white/80 backdrop-blur-sm rounded-3xl border border-cream-dark/50 shadow-card overflow-hidden">
         <div className="p-5">
           {/* Camera Overlay */}
           {showCamera && (
@@ -558,14 +572,14 @@ const Generator: React.FC<GeneratorProps> = ({ onDeckCreated, lang, onCameraStat
             <div className="flex gap-3 mb-5">
               <button 
                 onClick={startCamera}
-                className="flex-1 h-32 bg-accent rounded-2xl flex flex-col items-center justify-center gap-2 text-white shadow-glow hover:shadow-glow-lg active:scale-[0.98] transition-all"
+                className="flex-1 h-32 bg-gradient-to-br from-accent to-accent/90 rounded-2xl flex flex-col items-center justify-center gap-2 text-white shadow-glow hover:shadow-glow-lg active:scale-[0.98] transition-all"
               >
                 <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
                   <span className="material-symbols-outlined text-2xl">photo_camera</span>
                 </div>
                 <span className="text-sm font-semibold">{t.generator.camera}</span>
               </button>
-              <label className="flex-1 h-32 bg-gray-50 border-2 border-dashed border-gray-200 hover:border-accent hover:bg-accent/5 rounded-2xl flex flex-col items-center justify-center gap-2 text-gray-500 hover:text-accent active:scale-[0.98] transition-all cursor-pointer">
+              <label className="flex-1 h-32 bg-cream border-2 border-dashed border-cream-dark hover:border-accent hover:bg-accent/5 rounded-2xl flex flex-col items-center justify-center gap-2 text-moss-pale hover:text-accent active:scale-[0.98] transition-all cursor-pointer">
                 <input 
                   type="file" 
                   accept="image/*,application/pdf" 
@@ -577,7 +591,7 @@ const Generator: React.FC<GeneratorProps> = ({ onDeckCreated, lang, onCameraStat
                     }
                   }} 
                 />
-                <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center">
+                <div className="w-12 h-12 bg-cream-dark/50 rounded-xl flex items-center justify-center">
                   <span className="material-symbols-outlined text-2xl">upload_file</span>
                 </div>
                 <span className="text-sm font-semibold">{t.generator.upload}</span>
@@ -644,7 +658,7 @@ const Generator: React.FC<GeneratorProps> = ({ onDeckCreated, lang, onCameraStat
               value={content}
               onChange={(e) => setContent(e.target.value)}
               placeholder={t.generator.placeholder}
-              className="w-full bg-gray-50 border border-gray-200 rounded-xl p-4 text-sm text-gray-900 placeholder:text-gray-400 min-h-[120px] focus:ring-2 focus:ring-accent/20 focus:border-accent focus:bg-white transition-all resize-none"
+              className="w-full bg-cream/50 border border-cream-dark rounded-xl p-4 text-sm text-moss placeholder:text-moss-pale/60 min-h-[120px] focus:ring-2 focus:ring-accent/20 focus:border-accent focus:bg-white transition-all resize-none"
             />
             {content && (
               <div className="mt-1 text-right text-xs text-gray-400">
@@ -655,10 +669,10 @@ const Generator: React.FC<GeneratorProps> = ({ onDeckCreated, lang, onCameraStat
 
           {/* Settings Group */}
           <div className="grid grid-cols-3 gap-2 mb-5">
-            <div className="bg-gray-50 px-3 py-2.5 rounded-xl border border-gray-200">
+            <div className="bg-cream/50 px-3 py-2.5 rounded-xl border border-cream-dark">
               <div className="flex items-center gap-1 mb-1">
-                <span className="material-symbols-outlined text-xs text-gray-400">format_list_numbered</span>
-                <span className="text-[10px] text-gray-500">{t.generator.max}</span>
+                <span className="material-symbols-outlined text-xs text-moss-pale">format_list_numbered</span>
+                <span className="text-[10px] text-moss-pale">{t.generator.max}</span>
               </div>
               <select value={quantity} onChange={e => setQuantity(Number(e.target.value))} className="w-full bg-transparent border-none text-sm font-bold text-accent p-0 focus:ring-0 cursor-pointer">
                 <option value={5}>5</option>
@@ -666,22 +680,22 @@ const Generator: React.FC<GeneratorProps> = ({ onDeckCreated, lang, onCameraStat
                 <option value={20}>20</option>
               </select>
             </div>
-            <div className="bg-gray-50 px-3 py-2.5 rounded-xl border border-gray-200">
+            <div className="bg-cream/50 px-3 py-2.5 rounded-xl border border-cream-dark">
               <div className="flex items-center gap-1 mb-1">
-                <span className="material-symbols-outlined text-xs text-gray-400">translate</span>
-                <span className="text-[10px] text-gray-500">{t.generator.langLabel}</span>
+                <span className="material-symbols-outlined text-xs text-moss-pale">translate</span>
+                <span className="text-[10px] text-moss-pale">{t.generator.langLabel}</span>
               </div>
               <select value={genLanguage} onChange={e => setGenLanguage(e.target.value)} className="w-full bg-transparent border-none text-sm font-bold text-accent p-0 focus:ring-0 cursor-pointer">
                 <option value="Chinese">中文</option>
                 <option value="English">EN</option>
               </select>
             </div>
-            <div className="bg-gray-50 px-3 py-2.5 rounded-xl border border-gray-200">
+            <div className="bg-cream/50 px-3 py-2.5 rounded-xl border border-cream-dark">
               <div className="flex items-center gap-1 mb-1">
-                <span className="material-symbols-outlined text-xs text-gray-400">speed</span>
-                <span className="text-[10px] text-gray-500">{t.generator.difficulty}</span>
+                <span className="material-symbols-outlined text-xs text-moss-pale">speed</span>
+                <span className="text-[10px] text-moss-pale">{t.generator.difficulty}</span>
               </div>
-              <select value={difficulty} onChange={e => setDifficulty(e.target.value as DifficultyLevel)} className="w-full bg-transparent border-none text-sm font-bold text-accent p-0 focus:ring-0 cursor-pointer">
+              <select value={difficulty} onChange={e => setDifficulty(e.target.value as DifficultyLevel)} className="w-full bg-transparent border-none text-sm font-bold text-coral p-0 focus:ring-0 cursor-pointer">
                 <option value="easy">{t.generator.difficultyEasy}</option>
                 <option value="medium">{t.generator.difficultyMedium}</option>
                 <option value="hard">{t.generator.difficultyHard}</option>
@@ -692,7 +706,7 @@ const Generator: React.FC<GeneratorProps> = ({ onDeckCreated, lang, onCameraStat
           <button 
             onClick={handleCreate}
             disabled={loading || (!content.trim() && capturedImages.length === 0)}
-            className="w-full py-4 bg-gray-900 hover:bg-gray-800 text-white rounded-xl font-semibold flex items-center justify-center gap-2 shadow-card active:scale-[0.98] transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+            className="w-full py-4 bg-gradient-to-r from-coral to-coral/90 hover:from-coral/90 hover:to-coral text-white rounded-xl font-semibold flex items-center justify-center gap-2 shadow-coral-glow active:scale-[0.98] transition-all disabled:opacity-40 disabled:cursor-not-allowed"
           >
             {loading ? (
                <div className="flex items-center gap-2">
