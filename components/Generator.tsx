@@ -13,9 +13,10 @@ if (typeof window !== 'undefined') {
 interface GeneratorProps {
   onDeckCreated: (deck: Deck) => void;
   lang: Language;
+  onCameraStateChange?: (isOpen: boolean) => void;
 }
 
-const Generator: React.FC<GeneratorProps> = ({ onDeckCreated, lang }) => {
+const Generator: React.FC<GeneratorProps> = ({ onDeckCreated, lang, onCameraStateChange }) => {
   const t = translations[lang];
   const [content, setContent] = useState('');
   const [quantity, setQuantity] = useState(5);
@@ -42,6 +43,7 @@ const Generator: React.FC<GeneratorProps> = ({ onDeckCreated, lang }) => {
 
   const startCamera = async () => {
     setShowCamera(true);
+    onCameraStateChange?.(true);
     setError(null);
     setZoomLevel(1);
     try {
@@ -111,6 +113,7 @@ const Generator: React.FC<GeneratorProps> = ({ onDeckCreated, lang }) => {
       currentStreamRef.current = null;
     }
     setShowCamera(false);
+    onCameraStateChange?.(false);
     setZoomLevel(1);
   };
 

@@ -13,6 +13,7 @@ const App: React.FC = () => {
   const [lang, setLang] = useState<Language>('zh'); // 默认中文
   const [decks, setDecks] = useState<Deck[]>(INITIAL_DECKS);
   const [activeDeck, setActiveDeck] = useState<Deck | null>(null);
+  const [isCameraOpen, setIsCameraOpen] = useState(false);
 
   const t = translations[lang];
 
@@ -39,15 +40,15 @@ const App: React.FC = () => {
           </div>
         );
       case 'generate':
-        return <Generator lang={lang} onDeckCreated={handleAddDeck} />;
+        return <Generator lang={lang} onDeckCreated={handleAddDeck} onCameraStateChange={setIsCameraOpen} />;
       case 'study':
         return activeDeck ? (
           <StudyView deck={activeDeck} lang={lang} onExit={() => setView('library')} />
         ) : (
-          <Generator lang={lang} onDeckCreated={handleAddDeck} />
+          <Generator lang={lang} onDeckCreated={handleAddDeck} onCameraStateChange={setIsCameraOpen} />
         );
       default:
-        return <Generator lang={lang} onDeckCreated={handleAddDeck} />;
+        return <Generator lang={lang} onDeckCreated={handleAddDeck} onCameraStateChange={setIsCameraOpen} />;
     }
   };
 
@@ -58,7 +59,7 @@ const App: React.FC = () => {
       </main>
 
       {/* 移动端底部导航栏 */}
-      {view !== 'study' && (
+      {view !== 'study' && !isCameraOpen && (
         <div className="fixed bottom-0 left-0 right-0 z-40 px-6 pb-8 pt-4 bg-gradient-to-t from-white via-white/95 to-white/80 backdrop-blur-2xl border-t border-mint-100/40 flex items-center justify-around">
           {/* 导航栏背景装饰 */}
           <div className="absolute inset-0 overflow-hidden pointer-events-none">
