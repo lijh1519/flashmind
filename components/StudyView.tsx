@@ -137,7 +137,7 @@ const StudyView: React.FC<StudyViewProps> = ({ deck, lang, onExit }) => {
             /* 正常问题卡片 */
             <div onClick={() => setIsFlipped(!isFlipped)} className="relative w-full aspect-[1/1.3] perspective-1000 max-h-[520px]">
               <div className={`relative w-full h-full duration-700 preserve-3d transition-transform ${isFlipped ? 'rotate-y-180' : ''}`}>
-                <div className="absolute inset-0 bg-gradient-to-br from-white via-white to-mint-50/40 rounded-[40px] border-2 border-mint-200/60 shadow-card-hover backface-hidden p-12 flex flex-col items-center justify-center text-center overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-br from-white via-white to-mint-50/40 rounded-[40px] border-2 border-mint-200/60 shadow-card-hover [backface-visibility:hidden] p-12 flex flex-col items-center justify-center text-center overflow-hidden">
                   <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-accent/8 to-transparent rounded-full blur-3xl -mr-20 -mt-20 animate-pulse-soft"></div>
                   <div className="absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-tr from-primary/8 to-transparent rounded-full blur-3xl -ml-16 -mb-16 animate-pulse-soft" style={{animationDelay: '1.5s'}}></div>
                   
@@ -155,7 +155,7 @@ const StudyView: React.FC<StudyViewProps> = ({ deck, lang, onExit }) => {
                   </div>
                 </div>
 
-                <div className="absolute inset-0 bg-gradient-to-br from-accent via-accent to-accent/90 rounded-[40px] shadow-glow-lg rotate-y-180 backface-hidden p-12 flex flex-col items-center justify-center text-center text-white overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-br from-accent via-accent to-accent/90 rounded-[40px] shadow-glow-lg rotate-y-180 [backface-visibility:hidden] p-12 flex flex-col items-center justify-center text-center text-white overflow-hidden">
                   <div className="absolute top-0 left-0 w-48 h-48 bg-white/10 rounded-full blur-3xl -ml-24 -mt-24 animate-float"></div>
                   <div className="absolute bottom-0 right-0 w-40 h-40 bg-white/10 rounded-full blur-3xl -mr-20 -mb-20 animate-float" style={{animationDelay: '3s'}}></div>
                   <div className="absolute top-1/2 right-0 w-2 h-32 bg-white/5 blur-xl -mr-1"></div>
