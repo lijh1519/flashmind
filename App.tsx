@@ -91,6 +91,17 @@ const App: React.FC = () => {
             </div>
             <span className={`text-[10px] font-semibold ${view === 'library' ? 'text-accent' : 'text-gray-500'}`}>{t.nav.library}</span>
           </button>
+
+          {/* 语言切换按钮 */}
+          <button 
+            onClick={() => setLang(lang === 'zh' ? 'en' : 'zh')}
+            className="relative flex flex-col items-center gap-1.5 transition-all duration-200 text-gray-400 hover:text-gray-600 active:scale-95"
+          >
+            <div className="relative w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-200 bg-gray-100 hover:bg-gray-200">
+              <span className="text-sm font-bold text-gray-500">{lang === 'zh' ? 'EN' : '中'}</span>
+            </div>
+            <span className="text-[10px] font-semibold text-gray-500">{lang === 'zh' ? 'English' : '中文'}</span>
+          </button>
         </div>
       )}
     </div>

@@ -131,33 +131,35 @@ const StudyView: React.FC<StudyViewProps> = ({ deck, lang, onExit }) => {
             /* 正常问题卡片 */
             <div onClick={() => setIsFlipped(!isFlipped)} className="relative w-full aspect-[1/1.3] perspective-1000 max-h-[480px]">
               <div className={`relative w-full h-full duration-500 preserve-3d transition-transform ${isFlipped ? 'rotate-y-180' : ''}`}>
-                <div className="absolute inset-0 bg-white rounded-3xl border border-gray-200 shadow-card [backface-visibility:hidden] p-8 flex flex-col items-center justify-center text-center">
-                  <div className="w-full">
-                    <div className="inline-block px-3 py-1 bg-accent/10 rounded-full mb-6">
-                      <span className="text-xs font-medium text-accent">{t.study.question}</span>
+                {/* 正面 - 问题 */}
+                <div className="absolute inset-0 bg-white rounded-3xl border border-gray-200 shadow-card [backface-visibility:hidden] p-6 flex flex-col text-center">
+                  <div className="inline-block px-3 py-1 bg-accent/10 rounded-full mb-4 self-center">
+                    <span className="text-xs font-medium text-accent">{t.study.question}</span>
+                  </div>
+                  <div className="flex-1 overflow-y-auto mb-4" onClick={(e) => e.stopPropagation()}>
+                    <div className="min-h-full flex items-center justify-center">
+                      <h3 className="text-xl font-semibold text-gray-900 leading-relaxed px-2">{currentCard?.front}</h3>
                     </div>
-                    <div className="flex-1 flex items-center justify-center mb-6">
-                      <h3 className="text-xl font-semibold text-gray-900 leading-relaxed">{currentCard?.front}</h3>
-                    </div>
-                    <div className="text-xs text-gray-400 flex items-center gap-1.5 justify-center">
-                      <span className="material-symbols-outlined text-sm">touch_app</span>
-                      {t.study.tapReveal}
-                    </div>
+                  </div>
+                  <div className="text-xs text-gray-400 flex items-center gap-1.5 justify-center flex-shrink-0">
+                    <span className="material-symbols-outlined text-sm">touch_app</span>
+                    {t.study.tapReveal}
                   </div>
                 </div>
 
-                <div className="absolute inset-0 bg-accent rounded-3xl shadow-glow rotate-y-180 [backface-visibility:hidden] p-8 flex flex-col items-center justify-center text-center text-white">
-                  <div className="w-full">
-                    <div className="inline-block px-3 py-1 bg-white/20 rounded-full mb-6">
-                      <span className="text-xs font-medium text-white/90">{t.study.answer}</span>
+                {/* 背面 - 答案 */}
+                <div className="absolute inset-0 bg-accent rounded-3xl shadow-glow rotate-y-180 [backface-visibility:hidden] p-6 flex flex-col text-center text-white">
+                  <div className="inline-block px-3 py-1 bg-white/20 rounded-full mb-4 self-center">
+                    <span className="text-xs font-medium text-white/90">{t.study.answer}</span>
+                  </div>
+                  <div className="flex-1 overflow-y-auto mb-4" onClick={(e) => e.stopPropagation()}>
+                    <div className="min-h-full flex items-center justify-center">
+                      <div className="text-xl leading-relaxed text-white/95 px-2">{currentCard?.back}</div>
                     </div>
-                    <div className="flex-1 flex items-center justify-center mb-6 max-h-[280px] overflow-y-auto">
-                      <div className="text-xl leading-relaxed text-white/95">{currentCard?.back}</div>
-                    </div>
-                    <div className="text-xs text-white/70 flex items-center gap-1.5 justify-center">
-                      <span className="material-symbols-outlined text-sm">flip</span>
-                      {t.study.tapFlip}
-                    </div>
+                  </div>
+                  <div className="text-xs text-white/70 flex items-center gap-1.5 justify-center flex-shrink-0">
+                    <span className="material-symbols-outlined text-sm">flip</span>
+                    {t.study.tapFlip}
                   </div>
                 </div>
               </div>
