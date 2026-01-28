@@ -1,7 +1,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { generateFlashcards } from '../services/geminiService';
-import { Deck, GenerateConfig } from '../types';
+import { Deck, GenerateConfig, DifficultyLevel } from '../types';
 import { Language, translations } from '../i18n';
 import * as pdfjsLib from 'pdfjs-dist';
 
@@ -21,6 +21,7 @@ const Generator: React.FC<GeneratorProps> = ({ onDeckCreated, lang, onCameraStat
   const [content, setContent] = useState('');
   const [quantity, setQuantity] = useState(5);
   const [genLanguage, setGenLanguage] = useState('English');
+  const [difficulty, setDifficulty] = useState<DifficultyLevel>('medium');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [capturedImages, setCapturedImages] = useState<string[]>([]);
@@ -311,7 +312,7 @@ const Generator: React.FC<GeneratorProps> = ({ onDeckCreated, lang, onCameraStat
     setError(null);
     
     try {
-      const config: GenerateConfig = { content, quantity, language: genLanguage };
+      const config: GenerateConfig = { content, quantity, language: genLanguage, difficulty };
       // 支持多张图片
       const base64DataArray = capturedImages.length > 0 
         ? capturedImages.map(img => img.split(',')[1]) 
@@ -334,6 +335,7 @@ const Generator: React.FC<GeneratorProps> = ({ onDeckCreated, lang, onCameraStat
         lastStudied: lang === 'zh' ? '刚刚' : 'Just now',
         cardCount: cards.length,
         originalContent: content || '（图片内容）',
+        difficulty,
       };
       
       onDeckCreated(newDeck);
@@ -652,26 +654,37 @@ const Generator: React.FC<GeneratorProps> = ({ onDeckCreated, lang, onCameraStat
           </div>
 
           {/* Settings Group */}
-          <div className="flex gap-3 mb-5">
-            <div className="flex-1 bg-gray-50 px-4 py-3 rounded-xl border border-gray-200 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-sm text-gray-400">format_list_numbered</span>
-                <span className="text-xs font-medium text-gray-600">{t.generator.max}</span>
+          <div className="grid grid-cols-3 gap-2 mb-5">
+            <div className="bg-gray-50 px-3 py-2.5 rounded-xl border border-gray-200">
+              <div className="flex items-center gap-1 mb-1">
+                <span className="material-symbols-outlined text-xs text-gray-400">format_list_numbered</span>
+                <span className="text-[10px] text-gray-500">{t.generator.max}</span>
               </div>
-              <select value={quantity} onChange={e => setQuantity(Number(e.target.value))} className="bg-transparent border-none text-base font-bold text-accent p-0 pr-4 focus:ring-0 cursor-pointer">
+              <select value={quantity} onChange={e => setQuantity(Number(e.target.value))} className="w-full bg-transparent border-none text-sm font-bold text-accent p-0 focus:ring-0 cursor-pointer">
                 <option value={5}>5</option>
                 <option value={10}>10</option>
                 <option value={20}>20</option>
               </select>
             </div>
-            <div className="flex-1 bg-gray-50 px-4 py-3 rounded-xl border border-gray-200 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-sm text-gray-400">translate</span>
-                <span className="text-xs font-medium text-gray-600">{t.generator.langLabel}</span>
+            <div className="bg-gray-50 px-3 py-2.5 rounded-xl border border-gray-200">
+              <div className="flex items-center gap-1 mb-1">
+                <span className="material-symbols-outlined text-xs text-gray-400">translate</span>
+                <span className="text-[10px] text-gray-500">{t.generator.langLabel}</span>
               </div>
-              <select value={genLanguage} onChange={e => setGenLanguage(e.target.value)} className="bg-transparent border-none text-base font-bold text-accent p-0 pr-4 focus:ring-0 cursor-pointer">
-                <option value="Chinese">中</option>
+              <select value={genLanguage} onChange={e => setGenLanguage(e.target.value)} className="w-full bg-transparent border-none text-sm font-bold text-accent p-0 focus:ring-0 cursor-pointer">
+                <option value="Chinese">中文</option>
                 <option value="English">EN</option>
+              </select>
+            </div>
+            <div className="bg-gray-50 px-3 py-2.5 rounded-xl border border-gray-200">
+              <div className="flex items-center gap-1 mb-1">
+                <span className="material-symbols-outlined text-xs text-gray-400">speed</span>
+                <span className="text-[10px] text-gray-500">{lang === 'zh' ? '难度' : 'Level'}</span>
+              </div>
+              <select value={difficulty} onChange={e => setDifficulty(e.target.value as DifficultyLevel)} className="w-full bg-transparent border-none text-sm font-bold text-accent p-0 focus:ring-0 cursor-pointer">
+                <option value="easy">{lang === 'zh' ? '简单' : 'Easy'}</option>
+                <option value="medium">{lang === 'zh' ? '中等' : 'Medium'}</option>
+                <option value="hard">{lang === 'zh' ? '困难' : 'Hard'}</option>
               </select>
             </div>
           </div>

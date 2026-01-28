@@ -54,7 +54,8 @@ const StudyView: React.FC<StudyViewProps> = ({ deck, lang, onExit }) => {
         deck.originalContent || deck.title,
         studyCards,
         lang === 'zh' ? '中文' : 'English',
-        1
+        1,
+        deck.difficulty || 'medium'
       );
       setStudyCards(prev => [...prev, ...newCards]);
       // 生成后自动跳转到新卡片

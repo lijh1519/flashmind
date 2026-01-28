@@ -1,8 +1,29 @@
 
-import { GenerateConfig, Card } from "../types";
+import { GenerateConfig, Card, DifficultyLevel } from "../types";
+
+// 难度等级描述映射
+const difficultyDescriptions: Record<DifficultyLevel, { zh: string; en: string }> = {
+  easy: {
+    zh: '简单级别：基础概念和定义，直接答案，适合初学者',
+    en: 'Easy level: Basic concepts and definitions, straightforward answers, suitable for beginners'
+  },
+  medium: {
+    zh: '中等级别：需要理解和应用，涉及原理和联系，适合有一定基础的学习者',
+    en: 'Medium level: Requires understanding and application, involves principles and connections'
+  },
+  hard: {
+    zh: '困难级别：深入分析和综合运用，复杂问题或边界情况，适合高级学习者',
+    en: 'Hard level: Deep analysis and comprehensive application, complex problems or edge cases'
+  }
+};
 
 export const generateFlashcards = async (config: GenerateConfig, imageBase64Array?: string[]): Promise<Card[]> => {
+  const difficultyDesc = config.language.toLowerCase().includes('chinese') || config.language === '中文'
+    ? difficultyDescriptions[config.difficulty].zh
+    : difficultyDescriptions[config.difficulty].en;
+
   const systemPrompt = `你是一个专业的助学助手。请将用户提供的文本或图片内容拆解为一组记忆卡片。
+难度要求：${difficultyDesc}
 必须遵循以下 JSON 格式： {"cards": [{"front": "问题/概念", "back": "简短答案/解释"}]}
 注意：每张卡片只包含一个原子化知识点，语言必须使用 ${config.language}。`;
 
@@ -89,11 +110,18 @@ export const generateMoreCards = async (
   originalContent: string,
   existingCards: Card[],
   language: string,
-  quantity: number = 1
+  quantity: number = 1,
+  difficulty: DifficultyLevel = 'medium'
 ): Promise<Card[]> => {
   const existingQuestions = existingCards.map((c, i) => `${i + 1}. ${c.front}`).join('\n');
   
+  const isZh = language.toLowerCase().includes('chinese') || language === '中文' || language.toLowerCase() === 'zh';
+  const difficultyDesc = isZh
+    ? difficultyDescriptions[difficulty].zh
+    : difficultyDescriptions[difficulty].en;
+  
   const systemPrompt = `你是一个专业的助学助手。请将用户提供的文本内容拆解为记忆卡片。
+难度要求：${difficultyDesc}
 必须遵循以下 JSON 格式： {"cards": [{"front": "问题/概念", "back": "简短答案/解释"}]}
 注意：每张卡片只包含一个原子化知识点，语言必须使用 ${language}。`;
 
