@@ -89,27 +89,25 @@ export const generateMoreCards = async (
   originalContent: string,
   existingCards: Card[],
   language: string,
-  quantity: number = 2
+  quantity: number = 1
 ): Promise<Card[]> => {
-  const existingQuestions = existingCards.map(c => c.front).join('\n- ');
+  const existingQuestions = existingCards.map((c, i) => `${i + 1}. ${c.front}`).join('\n');
   
-  const systemPrompt = `你是一个专业的助学助手。请根据用户提供的原始学习材料生成新的记忆卡片。
-重要规则：
-1. 必须严格围绕原始材料内容，不能跑题或引入无关知识
-2. 必须避免与已有问题重复
-3. 可以从不同角度、不同深度提问（如定义、原理、应用、对比等）
-4. 问题要有层次，从基础到进阶，帮助用户更全面理解材料
-5. 语言使用: ${language}
+  const systemPrompt = `你是一个专业的助学助手。请将用户提供的文本内容拆解为记忆卡片。
+必须遵循以下 JSON 格式： {"cards": [{"front": "问题/概念", "back": "简短答案/解释"}]}
+注意：每张卡片只包含一个原子化知识点，语言必须使用 ${language}。`;
 
-返回 JSON 格式：{"cards": [{"front": "问题", "back": "答案"}]}`;
+  const userPrompt = `请根据以下内容生成 ${quantity} 个新的记忆卡片：
 
-  const userPrompt = `原始学习材料：
 ${originalContent}
 
-已有的问题（请避免重复）：
-- ${existingQuestions}
+已有的问题（请生成不同的问题，可以从不同角度提问同一知识点，或者提问其他知识点）：
+${existingQuestions}
 
-请基于上述原始材料，生成 ${quantity} 个新的、不重复的问题。务必确保问题来源于原始材料，不要超出材料范围。`;
+要求：
+1. 不要完全重复已有问题
+2. 可以换个角度提问同一知识点（如定义、原理、应用、对比等）
+3. 或者提问原文中其他未覆盖的知识点`;
 
   try {
     const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
