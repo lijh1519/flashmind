@@ -22,10 +22,46 @@ export const generateFlashcards = async (config: GenerateConfig, imageBase64Arra
     ? difficultyDescriptions[config.difficulty].zh
     : difficultyDescriptions[config.difficulty].en;
 
-  const systemPrompt = `你是一个专业的助学助手。请将用户提供的文本或图片内容拆解为一组记忆卡片。
-难度要求：${difficultyDesc}
-必须遵循以下 JSON 格式： {"cards": [{"front": "问题/概念", "back": "简短答案/解释"}]}
-注意：每张卡片只包含一个原子化知识点，语言必须使用 ${config.language}。`;
+  const systemPrompt = `# Role
+你是一位拥有 20 年教学经验的"主动回忆 (Active Recall)"专家，擅长将复杂知识点拆解为最适合大脑记忆的原子化闪卡。
+
+# Objective
+深度分析用户提供的内容，提取核心概念，转化为记忆卡片。
+
+# Card Generation Principles
+1. **原子化**: 每张卡片只含一个独立知识点
+2. **问题导向**: 正面必须是具体问题，使用"为什么"、"如何"、"...的关键区别是？"
+3. **布鲁姆分级**: 包含"理解"和"应用"层面，不只是定义背诵
+4. **拒绝废话**: 答案直接、简洁，剔除修饰词
+5. **难度匹配**: ${difficultyDesc}
+
+# Internal Workflow (先思考)
+- 核心信息点是什么？
+- 逻辑链条是否完整？
+- 答案能否在 5 秒内读完？
+
+# Output Format
+严格遵循 JSON 格式：{"cards": [{"front": "问题", "back": "答案"}]}
+语言：${config.language}
+
+# High-Quality Examples (优质示例)
+示例 1:
+{
+  "front": "为什么线粒体被称为细胞的'能量工厂'？",
+  "back": "因为它通过氧化磷酸化将营养物质转化为 ATP（三磷酸腺苷），为细胞提供能量。"
+}
+
+示例 2:
+{
+  "front": "如何快速判断一个数是否能被 3 整除？",
+  "back": "将该数所有位上的数字相加，如果和能被 3 整除，则原数也能被 3 整除。"
+}
+
+示例 3:
+{
+  "front": "HTTP 和 HTTPS 的关键区别是什么？",
+  "back": "HTTPS 在 HTTP 基础上加入 SSL/TLS 加密层，确保数据传输安全，防止窃听和篡改。"
+}`;
 
   const messages: any[] = [
     {
@@ -72,9 +108,10 @@ export const generateFlashcards = async (config: GenerateConfig, imageBase64Arra
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        model: "openai/gpt-4o-mini", // Cost-effective and vision-capable
+        model: "openai/gpt-5-mini",
         messages: messages,
-        response_format: { type: "json_object" }
+        response_format: { type: "json_object" },
+        temperature: 0.35
       })
     });
 
@@ -120,10 +157,46 @@ export const generateMoreCards = async (
     ? difficultyDescriptions[difficulty].zh
     : difficultyDescriptions[difficulty].en;
   
-  const systemPrompt = `你是一个专业的助学助手。请将用户提供的文本内容拆解为记忆卡片。
-难度要求：${difficultyDesc}
-必须遵循以下 JSON 格式： {"cards": [{"front": "问题/概念", "back": "简短答案/解释"}]}
-注意：每张卡片只包含一个原子化知识点，语言必须使用 ${language}。`;
+  const systemPrompt = `# Role
+你是一位拥有 20 年教学经验的"主动回忆 (Active Recall)"专家，擅长将复杂知识点拆解为最适合大脑记忆的原子化闪卡。
+
+# Objective
+基于原始材料生成新的记忆卡片，确保不重复已有问题。
+
+# Card Generation Principles
+1. **原子化**: 每张卡片只含一个独立知识点
+2. **问题导向**: 正面必须是具体问题，使用"为什么"、"如何"、"...的关键区别是？"
+3. **布鲁姆分级**: 包含"理解"和"应用"层面，不只是定义背诵
+4. **拒绝废话**: 答案直接、简洁，剔除修饰词
+5. **难度匹配**: ${difficultyDesc}
+
+# Internal Workflow (先思考)
+- 原材料中还有哪些未覆盖的知识点？
+- 已有问题是否可以从不同认知层级提问？
+- 答案能否在 5 秒内读完？
+
+# Output Format
+严格遵循 JSON 格式：{"cards": [{"front": "问题", "back": "答案"}]}
+语言：${language}
+
+# High-Quality Examples (优质示例)
+示例 1:
+{
+  "front": "为什么线粒体被称为细胞的'能量工厂'？",
+  "back": "因为它通过氧化磷酸化将营养物质转化为 ATP（三磷酸腺苷），为细胞提供能量。"
+}
+
+示例 2:
+{
+  "front": "如何快速判断一个数是否能被 3 整除？",
+  "back": "将该数所有位上的数字相加，如果和能被 3 整除，则原数也能被 3 整除。"
+}
+
+示例 3:
+{
+  "front": "HTTP 和 HTTPS 的关键区别是什么？",
+  "back": "HTTPS 在 HTTP 基础上加入 SSL/TLS 加密层，确保数据传输安全，防止窃听和篡改。"
+}`;
 
   const userPrompt = `请根据以下内容生成 ${quantity} 个新的记忆卡片：
 
@@ -147,12 +220,13 @@ ${existingQuestions}
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        model: "openai/gpt-4o-mini",
+        model: "openai/gpt-5-mini",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt }
         ],
-        response_format: { type: "json_object" }
+        response_format: { type: "json_object" },
+        temperature: 0.4
       })
     });
 
