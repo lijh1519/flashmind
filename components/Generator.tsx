@@ -141,7 +141,7 @@ const Generator: React.FC<GeneratorProps> = ({ onDeckCreated, lang, onCameraStat
 
   // 应用缩放 - 使用 CSS transform 作为后备方案
   const applyZoom = async (zoom: number) => {
-    const clampedZoom = Math.max(1, Math.min(zoom, 5)); // 限制 1x-5x
+    const clampedZoom = Math.max(0.5, Math.min(zoom, 5)); // 限制 0.5x-5x，支持缩小到0.5倍
     
     if (!currentStreamRef.current) return;
     
