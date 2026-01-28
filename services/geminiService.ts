@@ -101,13 +101,13 @@ export const generateMoreCards = async (
 
 ${originalContent}
 
-已有的问题（请生成不同的问题，可以从不同角度提问同一知识点，或者提问其他知识点）：
+已有的问题：
 ${existingQuestions}
 
-要求：
-1. 不要完全重复已有问题
-2. 可以换个角度提问同一知识点（如定义、原理、应用、对比等）
-3. 或者提问原文中其他未覆盖的知识点`;
+要求（按优先级）：
+1. 优先生成原文中其他未覆盖的知识点
+2. 如果原文知识点已基本覆盖，再考虑从不同角度提问已有知识点
+3. 不要完全重复已有问题`;
 
   try {
     const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
