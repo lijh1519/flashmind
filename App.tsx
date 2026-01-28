@@ -53,14 +53,17 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 text-moss">
-      <main className="relative pb-24">
+    <div className="min-h-screen-safe bg-cream-light text-moss">
+      <main className="relative" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 96px)' }}>
         {renderContent()}
       </main>
 
       {/* 移动端底部导航栏 */}
       {view !== 'study' && !isCameraOpen && (
-        <div className="fixed bottom-0 left-0 right-0 z-40 px-6 pb-8 pt-4 bg-white border-t border-gray-100 flex items-center justify-around">
+        <div 
+          className="fixed bottom-0 left-0 right-0 z-40 px-6 pt-4 bg-white/95 backdrop-blur-xl border-t border-cream-dark/30 flex items-center justify-around"
+          style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 20px)' }}
+        >
           <button 
             onClick={() => setView('generate')}
             className={`relative flex flex-col items-center gap-1.5 transition-all duration-200 ${view === 'generate' ? 'text-accent' : 'text-gray-400 hover:text-gray-600 active:scale-95'}`}

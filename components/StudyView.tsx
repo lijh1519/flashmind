@@ -73,8 +73,8 @@ const StudyView: React.FC<StudyViewProps> = ({ deck, lang, onExit }) => {
   const currentCard = !isAddCardView ? studyCards[currentIndex] : null;
 
   return (
-    <div className="fixed inset-0 bg-gray-50 z-[100] flex flex-col safe-area-inset">
-      <div className="p-4 flex items-center justify-between">
+    <div className="fixed inset-0 bg-cream-light z-[100] flex flex-col h-screen-safe">
+      <div className="p-4 flex items-center justify-between" style={{ paddingTop: 'max(env(safe-area-inset-top), 16px)' }}>
         <button onClick={onExit} className="w-10 h-10 flex items-center justify-center rounded-xl bg-white border border-gray-200 text-gray-500 hover:text-gray-700 active:scale-90 transition-all">
           <span className="material-symbols-outlined">close</span>
         </button>
@@ -260,7 +260,7 @@ const StudyView: React.FC<StudyViewProps> = ({ deck, lang, onExit }) => {
       )}
 
       {viewMode === 'cards' && (
-        <div className="p-4 pb-8">
+        <div className="p-4" style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 24px)' }}>
           {/* 轮播导航栏 */}
           <div className="flex items-center justify-center gap-3 bg-white rounded-full px-4 py-3 shadow-card border border-gray-100 max-w-xs mx-auto">
             {/* 左箭头 */}

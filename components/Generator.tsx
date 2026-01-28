@@ -348,7 +348,77 @@ const Generator: React.FC<GeneratorProps> = ({ onDeckCreated, lang, onCameraStat
   };
 
   return (
-    <div className="max-w-md mx-auto px-4 pt-8 pb-24">
+    <>
+      {/* Camera Overlay - 全屏拍照 */}
+      {showCamera && (
+        <div 
+          className="fixed inset-0 z-[200] bg-black flex flex-col overflow-hidden safe-area-inset"
+          style={{ 
+            touchAction: 'none',
+            height: '100dvh',
+            width: '100vw',
+          }}
+        >
+          {/* 可点击拍照的视频区域 */}
+          <div 
+            className="flex-1 relative overflow-hidden"
+            onTouchStart={handleTouchStart}
+            onTouchMove={(e) => { e.preventDefault(); handleTouchMove(e); }}
+            onTouchEnd={handleTouchEnd}
+          >
+            <video ref={videoRef} autoPlay playsInline muted className="absolute inset-0 w-full h-full object-cover" />
+            
+            {/* 快门闪烁效果 */}
+            {showFlash && (
+              <div className="absolute inset-0 bg-white animate-pulse z-30 pointer-events-none" />
+            )}
+            
+            {/* 缩放指示器 */}
+            {zoomLevel > 1 && (
+              <div className="absolute top-8 left-0 right-0 flex justify-center pointer-events-none z-10">
+                <div className="bg-black/60 backdrop-blur-md px-4 py-2 rounded-full border border-white/20">
+                  <p className="text-white text-xs font-bold">{zoomLevel.toFixed(1)}x</p>
+                </div>
+              </div>
+            )}
+          </div>
+          
+          {/* 底部控制栏 */}
+          <div className="absolute bottom-0 left-0 right-0 pb-safe z-20" style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 24px)' }}>
+            <div className="flex items-center justify-center px-8 pb-6">
+              <div className="flex-1"></div>
+              
+              {/* 中间拍照按钮 */}
+              <button 
+                onClick={handleCaptureClick}
+                className="relative w-20 h-20 flex items-center justify-center group"
+              >
+                {/* 外圈 - 脉动效果 */}
+                <div className="absolute inset-0 rounded-full border-4 border-white/30 group-active:scale-95 transition-transform"></div>
+                <div className="absolute inset-0 rounded-full border-4 border-white/20 animate-ping"></div>
+                
+                {/* 内圈 - 主按钮 */}
+                <div className="relative w-16 h-16 bg-white rounded-full shadow-glow-lg group-active:scale-90 transition-all duration-150 flex items-center justify-center">
+                  <div className="w-14 h-14 bg-gradient-to-br from-accent via-accent to-accent/80 rounded-full shadow-inner"></div>
+                </div>
+              </button>
+              
+              <div className="flex-1"></div>
+            </div>
+          </div>
+          
+          {/* 关闭按钮 */}
+          <button 
+            onClick={stopCamera} 
+            className="absolute left-6 w-12 h-12 flex items-center justify-center rounded-full bg-black/60 backdrop-blur-md text-white hover:bg-black/80 transition-all active:scale-90 z-20"
+            style={{ top: 'max(env(safe-area-inset-top), 24px)' }}
+          >
+            <span className="material-symbols-outlined text-2xl">close</span>
+          </button>
+        </div>
+      )}
+
+      <div className="max-w-md mx-auto px-4 pt-8 pb-24">
       {/* 3D Hero Section */}
       <div className="relative mb-8">
         {/* 背景装饰 */}
@@ -385,14 +455,8 @@ const Generator: React.FC<GeneratorProps> = ({ onDeckCreated, lang, onCameraStat
             
             {/* 3D 浮动元素 */}
             <div className="absolute -top-3 -right-2" style={{transform: 'translateZ(30px)'}}>
-              <div className="w-14 h-14 bg-gradient-to-br from-coral to-coral/80 rounded-2xl shadow-coral-glow flex items-center justify-center animate-bounce-soft rotate-12">
-                <span className="text-2xl">✨</span>
-              </div>
-            </div>
-            
-            <div className="absolute -bottom-2 -left-2" style={{transform: 'translateZ(20px)'}}>
-              <div className="w-12 h-12 bg-gradient-to-br from-accent to-accent/80 rounded-xl shadow-glow flex items-center justify-center animate-float -rotate-6">
-                <span className="text-xl">📚</span>
+              <div className="w-14 h-14 bg-gradient-to-br from-accent to-accent/80 rounded-2xl shadow-glow flex items-center justify-center animate-bounce-soft rotate-12">
+                <span className="text-2xl">📚</span>
               </div>
             </div>
             
@@ -408,70 +472,6 @@ const Generator: React.FC<GeneratorProps> = ({ onDeckCreated, lang, onCameraStat
       {/* Creation Area */}
       <div className="bg-white/80 backdrop-blur-sm rounded-3xl border border-cream-dark/50 shadow-card overflow-hidden">
         <div className="p-5">
-          {/* Camera Overlay */}
-          {showCamera && (
-            <div 
-              className="fixed inset-0 z-[100] bg-black flex flex-col overflow-hidden"
-              style={{ touchAction: 'none' }}
-            >
-              {/* 可点击拍照的视频区域 */}
-              <div 
-                className="flex-1 relative overflow-hidden"
-                onTouchStart={handleTouchStart}
-                onTouchMove={(e) => { e.preventDefault(); handleTouchMove(e); }}
-                onTouchEnd={handleTouchEnd}
-              >
-                <video ref={videoRef} autoPlay playsInline muted className="absolute inset-0 w-full h-full object-cover" />
-                
-                {/* 快门闪烁效果 */}
-                {showFlash && (
-                  <div className="absolute inset-0 bg-white animate-pulse z-30 pointer-events-none" />
-                )}
-                
-                {/* 缩放指示器 */}
-                {zoomLevel > 1 && (
-                  <div className="absolute top-8 left-0 right-0 flex justify-center pointer-events-none z-10">
-                    <div className="bg-black/60 backdrop-blur-md px-4 py-2 rounded-full border border-white/20">
-                      <p className="text-white text-xs font-bold">{zoomLevel.toFixed(1)}x</p>
-                    </div>
-                  </div>
-                )}
-              </div>
-              
-              {/* 底部控制栏 */}
-              <div className="absolute bottom-24 left-0 right-0 pb-6 z-20">
-                <div className="flex items-center justify-center px-8">
-                  <div className="flex-1"></div>
-                  
-                  {/* 中间拍照按钮 */}
-                  <button 
-                    onClick={handleCaptureClick}
-                    className="relative w-20 h-20 flex items-center justify-center group"
-                  >
-                    {/* 外圈 - 脉动效果 */}
-                    <div className="absolute inset-0 rounded-full border-4 border-white/30 group-active:scale-95 transition-transform"></div>
-                    <div className="absolute inset-0 rounded-full border-4 border-white/20 animate-ping"></div>
-                    
-                    {/* 内圈 - 主按钮 */}
-                    <div className="relative w-16 h-16 bg-white rounded-full shadow-glow-lg group-active:scale-90 transition-all duration-150 flex items-center justify-center">
-                      <div className="w-14 h-14 bg-gradient-to-br from-accent via-accent to-accent/80 rounded-full shadow-inner"></div>
-                    </div>
-                  </button>
-                  
-                  <div className="flex-1"></div>
-                </div>
-              </div>
-              
-              {/* 关闭按钮 */}
-              <button 
-                onClick={stopCamera} 
-                className="absolute top-6 left-6 w-12 h-12 flex items-center justify-center rounded-full bg-black/60 backdrop-blur-md text-white hover:bg-black/80 transition-all active:scale-90 z-20"
-              >
-                <span className="material-symbols-outlined text-2xl">close</span>
-              </button>
-            </div>
-          )}
-
           {capturedImages.length > 0 || uploadedFiles.length > 0 ? (
             <div className="mb-6 space-y-3">
               {/* 拍摄成功提示 */}
@@ -726,7 +726,8 @@ const Generator: React.FC<GeneratorProps> = ({ onDeckCreated, lang, onCameraStat
       </div>
       
       <canvas ref={canvasRef} className="hidden" />
-    </div>
+      </div>
+    </>
   );
 };
 
