@@ -14,6 +14,7 @@ export interface Deck {
   cards: Card[];
   lastStudied: string;
   cardCount: number;
+  originalContent?: string; // 保存原始输入内容
 }
 
 export type AppView = 'library' | 'generate' | 'study';
