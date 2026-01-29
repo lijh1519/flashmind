@@ -22,6 +22,7 @@ const Generator: React.FC<GeneratorProps> = ({ onDeckCreated, lang, onCameraStat
   const [quantity, setQuantity] = useState(5);
   const [genLanguage, setGenLanguage] = useState('English');
   const [difficulty, setDifficulty] = useState<DifficultyLevel>('medium');
+  const [learningGoal, setLearningGoal] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [capturedImages, setCapturedImages] = useState<string[]>([]);
@@ -312,7 +313,7 @@ const Generator: React.FC<GeneratorProps> = ({ onDeckCreated, lang, onCameraStat
     setError(null);
     
     try {
-      const config: GenerateConfig = { content, quantity, language: genLanguage, difficulty };
+      const config: GenerateConfig = { content, quantity, language: genLanguage, difficulty, learningGoal: learningGoal.trim() || undefined };
       // 支持多张图片
       const base64DataArray = capturedImages.length > 0 
         ? capturedImages.map(img => img.split(',')[1]) 
@@ -701,6 +702,22 @@ const Generator: React.FC<GeneratorProps> = ({ onDeckCreated, lang, onCameraStat
                 <option value="hard">{t.generator.difficultyHard}</option>
               </select>
             </div>
+          </div>
+
+          {/* 学习目标（选填） */}
+          <div className="mb-5">
+            <div className="flex items-center gap-1 mb-2">
+              <span className="material-symbols-outlined text-xs text-moss-pale">target</span>
+              <span className="text-xs text-moss-pale">{t.generator.learningGoal}</span>
+              <span className="text-[10px] text-gray-400">({lang === 'zh' ? '选填' : 'optional'})</span>
+            </div>
+            <input
+              type="text"
+              value={learningGoal}
+              onChange={(e) => setLearningGoal(e.target.value)}
+              placeholder={t.generator.learningGoalPlaceholder}
+              className="w-full bg-cream/50 border border-cream-dark rounded-xl px-4 py-3 text-sm text-moss placeholder:text-moss-pale/60 focus:ring-2 focus:ring-accent/20 focus:border-accent focus:bg-white transition-all"
+            />
           </div>
 
           <button 

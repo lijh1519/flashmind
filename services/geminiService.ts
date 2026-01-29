@@ -22,6 +22,11 @@ export const generateFlashcards = async (config: GenerateConfig, imageBase64Arra
     ? difficultyDescriptions[config.difficulty].zh
     : difficultyDescriptions[config.difficulty].en;
 
+  // 学习目标约束
+  const learningGoalConstraint = config.learningGoal 
+    ? `\n6. **学习目标**: 问题必须针对「${config.learningGoal}」这一目标设计，确保问题的深度、词汇和方向符合该目标受众`
+    : '';
+
   const systemPrompt = `# Role
 你是一个高精度的"知识还原专家"。你的任务是将原始文本拆解为记忆闪卡，答案必须是原文的"高保真镜像"，严禁过度压缩或改写。
 
@@ -35,7 +40,7 @@ export const generateFlashcards = async (config: GenerateConfig, imageBase64Arra
 2. **逻辑不流失**: 如果结论有多个支撑点，必须全部罗列，不能只给宽泛总结
 3. **拒绝润色**: 保持原文陈述语调，不要改写句式
 4. **原子化但完整**: 每张卡片只讲一个因果链，但链条必须完整
-5. **难度匹配**: ${difficultyDesc}
+5. **难度匹配**: ${difficultyDesc}${learningGoalConstraint}
 
 # Step-by-Step Thinking (隐性思考)
 1. 识别：这段话的核心因果词在哪？

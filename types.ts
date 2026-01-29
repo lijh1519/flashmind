@@ -29,4 +29,5 @@ export interface GenerateConfig {
   language: string;
   content: string;
   difficulty: DifficultyLevel; // 难度系数
+  learningGoal?: string; // 学习目标/方向（选填）
 }
